@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stars</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <canvas class="myCanvas">
+        <p>Add suitable fallback here.</p>
+    </canvas>
+    <script>
+        class RAtype {
+            constructor(h = 3, dm = 4) {
+                this.h = h;
+                this.dm = dm;
+            }
+        }
+        class DEtype {
+            constructor(d = 3, m = 4) {
+                this.d = d;
+                this.m = m;
+            }
+        }
+
+        const canvas = document.querySelector('.myCanvas');
+        const cwidth = canvas.width = window.innerWidth;
+        const cheight = canvas.height = window.innerHeight;
+
+        var eventq = 0;
+        document.addEventListener('keydown', function (event) {
+            eventq = event.keyCode;
+        });
+
+        var Tschioo = new Audio('Tschioo.mp3');
+        var Prrt = new Audio('Prrt.mp3');
+        var Bouff = new Audio('Bouff.mp3');
+        var Flick = new Audio('Flick.mp3');
+        var Swoosh = new Audio('Swoosh.mp3');
+        var Dioomm = new Audio('Dioomm.mp3');
+        var Tetris = new Audio('stars theme.mp3');
+        Tetris.volume = 0.0;
+
+
+        var viewRA = new RAtype;
+        var viewDE = new DEtype(7, 8);
+
+        function draw_star(ctx, x, y) {
+            // fill with background color
+            ctx.fillStyle = 'white';
+            ctx.fillRect(x, y, 10, 10);
+            ctx.beginPath();
+            ctx.arc(x, y, 50, 0, 2 * Math.PI);
+            ctx.fill();
+        }
+        function draw_field(ctx) {
+            // fill with background color
+            ctx.fillStyle = 'rgb(5, 5, 25)';
+            ctx.fillRect(0, 0, cwidth, cheight);
+            // text
+            ctx.fillStyle = 'red';
+            ctx.font = '48px georgia';
+            ctx.fillText('RA: ' + viewRA.h.toString() + '.' + viewRA.dm.toString(), 100, 300);
+            ctx.fillText('Dekl: ' + viewDE.d.toString() + '.' + viewDE.m.toString(), 100, 400);
+            draw_star(ctx, cwidth / 2, cheight / 2);
+        }
+
+        const st_insertcoin = 0;
+        const st_playing = 1;
+        const st_gameover = 2;
+        var status = st_insertcoin;
+        function loop() {
+            const ctx = canvas.getContext('2d');
+            //console.log('status ' + status + ' event ' + eventq + ' c_part ' + c_part + ' c_height ' + c_height);
+            if (status == st_insertcoin) {
+                //process event:
+                switch (eventq) {
+                    case 32:
+                    case 13:
+                        Tetris.play();
+                        status = st_playing;
+                        break;
+                }
+                eventq = 0;
+                // fill with background color
+                ctx.fillStyle = 'rgb(5, 5, 25)';
+                ctx.fillRect(0, 0, cwidth, cheight);
+                // text
+                ctx.fillStyle = 'blue';
+                ctx.font = '128px georgia';
+                ctx.fillText('STARS', 100, 100);
+                ctx.font = '48px georgia';
+                ctx.fillText('Press SPACE to start', 100, 200);
+            }
+            else if (status == st_gameover) {
+                //process event:
+                switch (eventq) {
+                    case 32:
+                    case 13:
+                        Flick.play();
+                        status = st_insertcoin;
+                        break;
+                }
+                eventq = 0;
+                // fill with background color
+                ctx.fillStyle = 'rgb(255, 255, 255)';
+                ctx.fillRect(0, 0, cwidth, cheight);
+                // draw
+                draw_field(ctx);
+                // text
+                ctx.fillStyle = 'red';
+                ctx.font = '64px georgia bold';
+                ctx.fillText('GAME OVER', getox(0), getoy(height / 2 - 2));
+                ctx.font = '48px georgia';
+                ctx.fillText('Press SPACE', getox(0), getoy(height / 2));
+            }
+            else if (status == st_playing) {
+                //process event:
+                switch (eventq) {
+                    case 37:
+                        //left
+                        break;
+                    case 39:
+                        //right
+                        break;
+                    case 38:
+                        //up
+                        break;
+                    case 32:
+                        //space
+                }
+                eventq = 0;
+                // draw
+                draw_field(ctx);
+            }
+            requestAnimationFrame(loop);
+        }
+        loop();
+    </script>
+</body>
+</html>
