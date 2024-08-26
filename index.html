@@ -118,6 +118,11 @@
                 this.y -= a.y;
                 this.z -= a.z;
             }
+            add(a) {
+                this.x += a.x;
+                this.y += a.y;
+                this.z += a.z;
+            }
             angle(v) {
                 // angle between this and v
                 return Math.acos(this.sproduct(v) / this.abs() / v.abs());
@@ -130,6 +135,8 @@
         }
         class NAtype {
             // Hesse normal form. Can be a plane or a line
+            // plane: n (x-a) = 0
+            // line: x(l) = l*n + a
             constructor(n, a) {
                 this.n = n;   // nota: |n| = 1
                 this.a = a;   // a point in the plane / line 
@@ -154,6 +161,13 @@
                 x.mul(l);
                 x.add(this.a);
                 return x;
+            }
+            intersection_point(line) {
+                let cos_g = this.n.sproduct(line.n) / 1 / 1;
+                let a = this.a.clone();
+                a.subtract(line.a);
+                let l = this.n.sproduct(a) / cos_g;
+                return line.x(l);
             }
         }
         // the stars
@@ -209,6 +223,8 @@
                 if (g != 0) d = sx / Math.sin(g);
                 let s = i11.clone();
                 s.mul(d);  // 
+                s2 = screen.intersection_point(new NAtype(i11, new V3Dtype(0, 0, 0)));
+                s2x = p0x.distance(s2);
                 //s.subtract(screen.a);
                 ctx.fillStyle = 'blue';
                 ctx.fillText('RA=' + i
@@ -216,11 +232,13 @@
                     + ' => d= ' + d.toFixed(2)
                     + ', angle gamma=' + g.toFixed(2)
                     + ', s=' + s.toString()
+                    + ', s2=' + s2.toString()
+                    + ', s2x=' + s2x.toFixed(2)
                     , 0, i * 20 + 150);
                 e = RADEtoV3D(ego);
                 let mag = 0;
                 if (i == 0) mag = -1;
-                draw_star(ctx, 'yellow', mag, cwidth / 2 + s.y / 4 * cwidth / 2, cheight / 2);
+                draw_star(ctx, 'yellow', mag, cwidth / 2 + s2x / 4 * cwidth / 2, cheight / 2);
             }
             // draw zero meridian
             for (let i = 0; i < 24; ++i) {
@@ -246,7 +264,7 @@
                 e = RADEtoV3D(ego);
                 let mag = 0;
                 if (i == 0) mag = -1;
-                draw_star(ctx, 'yellow', mag, cwidth / 2 + s.y / 4 * cwidth / 2, cheight / 2 + s.z / 4 *cwidth / 2);
+                //draw_star(ctx, 'yellow', mag, cwidth / 2 + s.y / 4 * cwidth / 2, cheight / 2 + s.z / 4 *cwidth / 2);
             }
             // draw ecliptic
             // draw stars
