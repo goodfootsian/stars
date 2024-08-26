@@ -98,6 +98,10 @@
             clone(a) {
                 return new V3Dtype(this.x, this.y, this.z);
             }
+            xproduct(b) {
+                let result = new V3Dtype(this.y*b.z - this.z*b.y, this.z*b.x - this.x-b.z, this.x*b.y-this.y-b.x);
+                return result;
+            }
             abs() {
                 return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
             }
@@ -164,12 +168,14 @@
             ctx.fillStyle = 'blue';
             ctx.font = '24px georgia';
             let e = ego.toV3D();
+            let eP = egoP.toV3D();
+            let v0x = e.xproduct(eP);
             screen = new HPLANEtype(e, e);
             //e.mul(.5);
-            /*
             ctx.fillText('Ego: RA= ' + ego.h.toString() + '.' + ego.dm.toString() + ', DE=' + ego.d.toString() + '.' + ego.m.toString()
-                + ' (' + e.x.toFixed(2) + ', ' + e.y.toFixed(2) + ', ' + e.z.toFixed(2) + ')',
+                + e.toString() + ', ' + eP.toString(),
                 0, 50);
+            /*
             ctx.fillText('Distance= ' + screen.distance(e).toFixed(2), 0, 100);
             ctx.fillText('Angle= ' + e.angle(new V3Dtype(1, 0, 0)), 0, 120);
             //ctx.fillText('Ego: (' + e.x.toString() + ', ' + egoDE.m.toString() + ', SpT=' + stars[1].SpT.toString(), 100, 400);
@@ -187,14 +193,12 @@
                 s.mul(d);
                 s.subtract(screen.a);
                 ctx.fillStyle = 'blue';
-                /*
                 ctx.fillText('RA=' + i
                     + ' => sx= ' + sx.toFixed(2)
                     + ' => d= ' + d.toFixed(2)
                     + ', angle gamma=' + g.toFixed(2)
                     + ', s=' + s.toString()
                     , 0, i * 20 + 150);
-                    */
                 e = RADEtoV3D(ego);
                 let mag = 0;
                 if (i == 0) mag = -1;
@@ -213,12 +217,14 @@
                 s.mul(d);
                 s.subtract(screen.a);
                 ctx.fillStyle = 'blue';
+                /*
                 ctx.fillText('RA=' + i
                     + ' => sx= ' + sx.toFixed(2)
                     + ' => d= ' + d.toFixed(2)
                     + ', angle gamma=' + g.toFixed(2)
                     + ', s=' + s.toString()
                     , 0, i * 20 + 150);
+                    */
                 e = RADEtoV3D(ego);
                 let mag = 0;
                 if (i == 0) mag = -1;
