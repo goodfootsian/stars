@@ -99,7 +99,7 @@
                 return new V3Dtype(this.x, this.y, this.z);
             }
             xproduct(b) {
-                let result = new V3Dtype(this.y*b.z - this.z*b.y, this.z*b.x - this.x-b.z, this.x*b.y-this.y-b.x);
+                let result = new V3Dtype(this.y*b.z - this.z*b.y, this.z*b.x - this.x*b.z, this.x*b.y-this.y*b.x);
                 return result;
             }
             abs() {
@@ -123,17 +123,27 @@
 
             }
         }
-        class HPLANEtype {
+        class NAtype {
+            // Hesse normal form. Can be a plane or a line
             constructor(n, a) {
-                this.n = n;
-                this.a = a;
+                this.n = n;   // nota: |n| = 1
+                this.a = a;   // a point in the plane / line 
             }
             distance(q) {
+                // plane: distance to point 
+                // with sign: positive if the point is in the direction of the normal vector n
                 //let delta = new V3Dtype;
                 //delta.copy(this.a);
-                let delta = this.a.clone()
+                let delta = this.a.clone();
                 delta.subtract(q);
-                return Math.abs(delta.sproduct(this.n));
+                return delta.sproduct(this.n);
+            }
+            x(l) {
+                // line: a point on the line where distance between a and x is l
+                let x = this.n.clone();
+                x.mul(l);
+                x.add(this.a);
+                return x;
             }
         }
         // the stars
@@ -143,8 +153,6 @@
         // point of view
         var ego = new RADEtype(0, 0, 0, 0);
         var egoP = new RADEtype(0, 0, 90, 0);
-        // screen
-        var screen = new HPLANEtype(new V3Dtype(1, 0, 0), new V3Dtype(1, 0, 0))
 
         function RADEtoV3D(rade) {
             let a = new V3Dtype;
@@ -170,10 +178,10 @@
             let e = ego.toV3D();
             let eP = egoP.toV3D();
             let v0x = e.xproduct(eP);
-            screen = new HPLANEtype(e, e);
+            let screen = new NAtype(e, e);
             //e.mul(.5);
             ctx.fillText('Ego: RA= ' + ego.h.toString() + '.' + ego.dm.toString() + ', DE=' + ego.d.toString() + '.' + ego.m.toString()
-                + e.toString() + ', ' + eP.toString(),
+                + e.toString() + ', ' + eP.toString() + ', ' + v0x.toString(),
                 0, 50);
             /*
             ctx.fillText('Distance= ' + screen.distance(e).toFixed(2), 0, 100);
