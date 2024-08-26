@@ -38,14 +38,32 @@
         // my classes
         class RAtype {
             constructor(h = 3, dm = 4) {
-                this.h = h;  // increases when moving left
+                this.h = h;  // [0..23] increases when moving left
                 this.dm = dm;  // 10th of a minute
             }
         }
         class DEtype {
             constructor(d = 3, m = 4) {
+                this.d = d;    // [-90..90] positive is north, negative is south
+                this.m = m;
+            }
+        }
+        class RADEtype {
+            constructor(h = 3, dm = 4, d = 5, m = 6) {
+                this.h = h;  // increases when moving left
+                this.dm = dm;  // 10th of a minute
                 this.d = d;    // positive is north, negative is south
                 this.m = m;
+            }
+            toV3D() {
+                let a = new V3Dtype(0, 0, );
+                let ra = this.h / 24 * 2 * Math.PI + this.dm / 600;
+                let de = (this.d + this.m / 60) / 360 * 2 * Math.PI;
+                let r = Math.cos(de);
+                a.z = Math.sin(de);
+                a.x = r * Math.cos(ra);
+                a.y = r * Math.sin(ra);
+                return a;
             }
         }
         class STARtype {
@@ -61,14 +79,26 @@
                 this.SpT = SpT;
             }
         }
+        class V3Dtype {
+            constructor(x = 0, y = 0, z = 0) {
+                this.x = x;
+                this.y = y;
+                this.z = z;
+            }
+        }
         // the stars
         var stars = [];
-        stars.push(new STARtype("Sirius", "48915", "BD-16 1591", 6, 407, -16, 35, -1.58, "A0"));
-        stars.push(new STARtype("Rigel", "34085", "BD-08 1063", 5, 97, -8, 19, 0.34, "B8p"));
+        stars.push(new STARtype("Sirius", "48915", "BD-16 1591", 6, 407, -16, -35, -1.58, "A0"));
+        stars.push(new STARtype("Rigel", "34085", "BD-08 1063", 5, 97, -8, -19, 0.34, "B8p"));
         // point of view
-        var viewRA = new RAtype(0, 0);
-        var viewDE = new DEtype(0, 0);
+        var ego = new RADEtype(0, 0, 0, 0);
+        var egoP = new RADEtype(0, 0, 90, 0);
 
+        function RADEtoV3D(rade) {
+            let a = new V3Dtype;
+            //r = cos();
+            return a;
+        }
         function draw_star(ctx, x, y) {
             // fill with background color
             ctx.fillStyle = 'white';
@@ -83,10 +113,20 @@
             ctx.fillRect(0, 0, cwidth, cheight);
             // text
             ctx.fillStyle = 'red';
-            ctx.font = '48px georgia';
-            ctx.fillText('RA: ' + viewRA.h.toString() + '.' + viewRA.dm.toString() + ', Ptm=' + stars[0].Ptm.toString(), 100, 300);
-            ctx.fillText('Dekl: ' + viewDE.d.toString() + '.' + viewDE.m.toString() + ', SpT=' + stars[1].SpT.toString(), 100, 400);
+            ctx.font = '24px georgia';
+            let e = ego.toV3D();
+            ctx.fillText('Ego: RA= ' + ego.h.toString() + '.' + ego.dm.toString() + ', DE=' + ego.d.toString() + '.' + ego.m.toString()
+                + ' (' + e.x.toString() + ', ' + e.y.toString() + ', ' + e.z.toString() + ')',
+                0, 50);
+            //ctx.fillText('Ego: (' + e.x.toString() + ', ' + egoDE.m.toString() + ', SpT=' + stars[1].SpT.toString(), 100, 400);
             draw_star(ctx, cwidth / 2, cheight / 2);
+            // draw equator
+            for (let i = 0; i < 24; ++i) {
+                let e = new RADEtype(i, 0, 0, 0);
+                e = RADEtoV3D(ego);
+            }
+            // draw ecliptiv
+            // draw stars
         }
 
         const st_insertcoin = 0;
@@ -143,9 +183,11 @@
                 switch (eventq) {
                     case 37:
                         //left
+                        ego.h = (ego.h + 1) % 24;
                         break;
                     case 39:
                         //right
+                        ego.h = (ego.h + 23) % 24;
                         break;
                     case 38:
                         //up
