@@ -55,6 +55,11 @@
                 this.d = d;    // positive is north, negative is south
                 this.m = m;
             }
+            toString(name = 'RADE') {
+                let s = name + '(RA=' + this.h.toFixed(2) + ', dm=' + this.dm.toFixed(2) + ', DE=' + this.d.toFixed(2) + ', m=' + this.m.toFixed(2) + ')';
+                return s;
+
+            }
             toV3D() {
                 let a = new V3Dtype(0, 0, );
                 let ra = this.h / 24 * 2 * Math.PI + this.dm / 600;
@@ -117,8 +122,8 @@
                 // angle between this and v
                 return Math.acos(this.sproduct(v) / this.abs() / v.abs());
             }
-            toString() {
-                let s = '(' + this.x.toFixed(2) + ', ' + this.y.toFixed(2) + ', ' + this.z.toFixed(2) + ')';
+            toString(name = 'V3D') {
+                let s = name + '(' + this.x.toFixed(2) + ', ' + this.y.toFixed(2) + ', ' + this.z.toFixed(2) + ')';
                 return s;
 
             }
@@ -128,6 +133,11 @@
             constructor(n, a) {
                 this.n = n;   // nota: |n| = 1
                 this.a = a;   // a point in the plane / line 
+            }
+            toString(name = 'NAtype') {
+                let s = name + '[n=' + this.n.toString() + ', ' + this.a.toString() + ']';
+                return s;
+
             }
             distance(q) {
                 // plane: distance to point 
@@ -177,11 +187,11 @@
             ctx.font = '24px georgia';
             let e = ego.toV3D();
             let eP = egoP.toV3D();
-            let v0x = e.xproduct(eP);
+            let p0x = new NAtype(e.xproduct(eP), e);
             let screen = new NAtype(e, e);
             //e.mul(.5);
-            ctx.fillText('Ego: RA= ' + ego.h.toString() + '.' + ego.dm.toString() + ', DE=' + ego.d.toString() + '.' + ego.m.toString()
-                + e.toString() + ', ' + eP.toString() + ', ' + v0x.toString(),
+            ctx.fillText(ego.toString('Ego') + ', '
+                + e.toString('e') + ', ' + eP.toString('eP') + ', ' + p0x.toString('p0x'),
                 0, 50);
             /*
             ctx.fillText('Distance= ' + screen.distance(e).toFixed(2), 0, 100);
@@ -198,8 +208,8 @@
                 let d = 1;
                 if (g != 0) d = sx / Math.sin(g);
                 let s = i11.clone();
-                s.mul(d);
-                s.subtract(screen.a);
+                s.mul(d);  // 
+                //s.subtract(screen.a);
                 ctx.fillStyle = 'blue';
                 ctx.fillText('RA=' + i
                     + ' => sx= ' + sx.toFixed(2)
