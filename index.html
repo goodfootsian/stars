@@ -85,10 +85,21 @@
                 this.y = y;
                 this.z = z;
             }
+            mul(f) {
+                this.x *= f;
+                this.y *= f;
+                this.z *= f;
+            }
             copy(a) {
                 this.x = a.x;
                 this.y = a.y;
                 this.z = a.z;
+            }
+            clone(a) {
+                return new V3Dtype(this.x, this.y, this.z);
+            }
+            abs() {
+                return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
             }
             sproduct(a) {
                 return this.x * a.x + this.y * a.y + this.z * a.z;
@@ -98,6 +109,15 @@
                 this.y -= a.y;
                 this.z -= a.z;
             }
+            angle(v) {
+                // angle between this and v
+                return Math.acos(this.sproduct(v) / this.abs() / v.abs());
+            }
+            toString() {
+                let s = '(' + this.x.toFixed(2) + ', ' + this.y.toFixed(2) + ', ' + this.z.toFixed(2) + ')';
+                return s;
+
+            }
         }
         class HPLANEtype {
             constructor(n, a) {
@@ -105,9 +125,9 @@
                 this.a = a;
             }
             distance(q) {
-                let delta = new V3Dtype;
-                delta.copy(this.a);
-                //delta = JSON.parse(JSON.stringify(this.a));
+                //let delta = new V3Dtype;
+                //delta.copy(this.a);
+                let delta = this.a.clone()
                 delta.subtract(q);
                 return Math.abs(delta.sproduct(this.n));
             }
@@ -130,9 +150,9 @@
         function draw_star(ctx, x, y) {
             // fill with background color
             ctx.fillStyle = 'white';
-            ctx.fillRect(x, y, 10, 10);
+            //ctx.fillRect(x, y, 10, 10);
             ctx.beginPath();
-            ctx.arc(x, y, 50, 0, 2 * Math.PI);
+            ctx.arc(x, y, 10, 0, 2 * Math.PI);
             ctx.fill();
         }
         function draw_field(ctx) {
@@ -143,18 +163,38 @@
             ctx.fillStyle = 'red';
             ctx.font = '24px georgia';
             let e = ego.toV3D();
+            screen = new HPLANEtype(e, e);
+            //e.mul(.5);
+            /*
             ctx.fillText('Ego: RA= ' + ego.h.toString() + '.' + ego.dm.toString() + ', DE=' + ego.d.toString() + '.' + ego.m.toString()
                 + ' (' + e.x.toFixed(2) + ', ' + e.y.toFixed(2) + ', ' + e.z.toFixed(2) + ')',
                 0, 50);
             ctx.fillText('Distance= ' + screen.distance(e).toFixed(2), 0, 100);
+            ctx.fillText('Angle= ' + e.angle(new V3Dtype(1, 0, 0)), 0, 120);
             //ctx.fillText('Ego: (' + e.x.toString() + ', ' + egoDE.m.toString() + ', SpT=' + stars[1].SpT.toString(), 100, 400);
-            draw_star(ctx, cwidth / 2, cheight / 2);
+            */
             // draw equator
             for (let i = 0; i < 24; ++i) {
-                let e = new RADEtype(i, 0, 0, 0);
+                let i1 = new RADEtype(i, 0, 0, 0);
+                let i11 = i1.toV3D();
+                let g = i11.angle(screen.n);
+                if (Math.abs(g) >= Math.PI / 2) continue;
+                let sx = Math.sin(g) / Math.sin(Math.PI / 2 - g);
+                let d = 1;
+                if (g != 0) d = sx / Math.sin(g);
+                let s = i11.clone();
+                s.mul(d);
+                //s.subtract(screen.a);
+                ctx.fillText('RA=' + i
+                    + ' => sx= ' + sx.toFixed(2)
+                    + ' => d= ' + d.toFixed(2)
+                    + ', angle gamma=' + g.toFixed(2)
+                    + ', s=' + s.toString()
+                    , 0, i * 20 + 150);
                 e = RADEtoV3D(ego);
+                draw_star(ctx, cwidth / 2 + s.y / 4 * cwidth / 2, cheight / 2);
             }
-            // draw ecliptiv
+            // draw ecliptic
             // draw stars
         }
 
