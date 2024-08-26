@@ -185,7 +185,33 @@
                 if (g != 0) d = sx / Math.sin(g);
                 let s = i11.clone();
                 s.mul(d);
-                //s.subtract(screen.a);
+                s.subtract(screen.a);
+                ctx.fillStyle = 'blue';
+                /*
+                ctx.fillText('RA=' + i
+                    + ' => sx= ' + sx.toFixed(2)
+                    + ' => d= ' + d.toFixed(2)
+                    + ', angle gamma=' + g.toFixed(2)
+                    + ', s=' + s.toString()
+                    , 0, i * 20 + 150);
+                    */
+                e = RADEtoV3D(ego);
+                let mag = 0;
+                if (i == 0) mag = -1;
+                draw_star(ctx, 'yellow', mag, cwidth / 2 + s.y / 4 * cwidth / 2, cheight / 2);
+            }
+            // draw zero meridian
+            for (let i = 0; i < 24; ++i) {
+                let i1 = new RADEtype(0, 0, i*15, 0);
+                let i11 = i1.toV3D();
+                let g = i11.angle(screen.n);
+                if (Math.abs(g) >= Math.PI / 2) continue;
+                let sx = Math.sin(g) / Math.sin(Math.PI / 2 - g);
+                let d = 1;
+                if (g != 0) d = sx / Math.sin(g);
+                let s = i11.clone();
+                s.mul(d);
+                s.subtract(screen.a);
                 ctx.fillStyle = 'blue';
                 ctx.fillText('RA=' + i
                     + ' => sx= ' + sx.toFixed(2)
@@ -196,7 +222,7 @@
                 e = RADEtoV3D(ego);
                 let mag = 0;
                 if (i == 0) mag = -1;
-                draw_star(ctx, 'yellow', mag, cwidth / 2 + s.y / 4 * cwidth / 2, cheight / 2);
+                draw_star(ctx, 'yellow', mag, cwidth / 2 + s.y / 4 * cwidth / 2, cheight / 2 + s.z / 4 *cwidth / 2);
             }
             // draw ecliptic
             // draw stars
