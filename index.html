@@ -62,7 +62,7 @@
             }
             toV3D() {
                 let a = new V3Dtype(0, 0, );
-                let ra = this.h / 24 * 2 * Math.PI + this.dm / 600;
+                let ra = (this.h + this.dm / 600) / 24 * 2 * Math.PI;
                 let de = (this.d + this.m / 60) / 360 * 2 * Math.PI;
                 let r = Math.cos(de);
                 a.z = Math.sin(de);
@@ -169,6 +169,12 @@
                 let l = this.n.sproduct(a) / cos_g;
                 return line.x(l);
             }
+            screen_coordinates(p0x, p0y, n) {
+                let s2 = this.intersection_point(new NAtype(n, new V3Dtype(0, 0, 0)));
+                let s2x = p0x.distance(s2);
+                let s2y = p0y.distance(s2);
+                return new V3Dtype(s2x, s2y, 0);
+            }
         }
         // the stars
         var stars = [];
@@ -202,6 +208,7 @@
             let e = ego.toV3D();
             let eP = egoP.toV3D();
             let p0x = new NAtype(e.xproduct(eP), e);
+            let p0y = new NAtype(eP, new V3Dtype(0, 0, 0));
             let screen = new NAtype(e, e);
             //e.mul(.5);
             ctx.fillText(ego.toString('Ego') + ', '
@@ -212,6 +219,24 @@
             ctx.fillText('Angle= ' + e.angle(new V3Dtype(1, 0, 0)), 0, 120);
             //ctx.fillText('Ego: (' + e.x.toString() + ', ' + egoDE.m.toString() + ', SpT=' + stars[1].SpT.toString(), 100, 400);
             */
+            // draw equator
+            for (let i = 0; i < 24; ++i) {
+                for (let j = 0; j < 24; ++j) {
+                    let equator_milestone = new RADEtype(i, 0, j*15, 0).toV3D();
+                    let s3 = screen.screen_coordinates(p0x, p0y, equator_milestone);
+                    /*
+                    ctx.fillStyle = 'blue';
+                    ctx.fillText('RA=' + i
+                        + ', ' + s3.toString()
+                        , 0, i * 20 + 150);
+                    e = RADEtoV3D(ego);
+                    */
+                    let mag = 0;
+                    if (i == 0) mag = -1;
+                    draw_star(ctx, 'yellow', 3, cwidth / 2 + s3.x / 6 * cwidth / 2, cheight / 2 + s3.y / 6 * cwidth);
+                }
+            }
+            /*
             // draw equator
             for (let i = 0; i < 24; ++i) {
                 let i1 = new RADEtype(i, 0, 0, 0);
@@ -253,21 +278,32 @@
                 s.mul(d);
                 s.subtract(screen.a);
                 ctx.fillStyle = 'blue';
-                /*
                 ctx.fillText('RA=' + i
                     + ' => sx= ' + sx.toFixed(2)
                     + ' => d= ' + d.toFixed(2)
                     + ', angle gamma=' + g.toFixed(2)
                     + ', s=' + s.toString()
                     , 0, i * 20 + 150);
-                    */
                 e = RADEtoV3D(ego);
                 let mag = 0;
                 if (i == 0) mag = -1;
                 //draw_star(ctx, 'yellow', mag, cwidth / 2 + s.y / 4 * cwidth / 2, cheight / 2 + s.z / 4 *cwidth / 2);
-            }
+        }
+            */
             // draw ecliptic
             // draw stars
+            for (let i = 0; i < stars.length; ++i) {
+                let starRADE = new RADEtype(stars[i].h, stars[i].dm, stars[i].d, stars[i].m);
+                let starpoint = starRADE.toV3D();
+                let s3 = screen.screen_coordinates(p0x, p0y, starpoint);
+                ctx.fillStyle = 'orange';
+                ctx.fillText('ix=' + i
+                    + ", " + starRADE.toString('starRADE')
+                    + ", " + starpoint.toString('starV3D')
+                    + ', ' + s3.toString()
+                    , 300, 150 + i * 20);
+                draw_star(ctx, 'red', stars[i].Ptm, cwidth / 2 + s3.x / 6 * cwidth / 2, cheight / 2 + s3.y / 6 * cwidth);
+            }
         }
 
         const st_insertcoin = 0;
