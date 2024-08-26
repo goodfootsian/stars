@@ -85,6 +85,32 @@
                 this.y = y;
                 this.z = z;
             }
+            copy(a) {
+                this.x = a.x;
+                this.y = a.y;
+                this.z = a.z;
+            }
+            sproduct(a) {
+                return this.x * a.x + this.y * a.y + this.z * a.z;
+            }
+            subtract(a) {
+                this.x -= a.x;
+                this.y -= a.y;
+                this.z -= a.z;
+            }
+        }
+        class HPLANEtype {
+            constructor(n, a) {
+                this.n = n;
+                this.a = a;
+            }
+            distance(q) {
+                let delta = new V3Dtype;
+                delta.copy(this.a);
+                //delta = JSON.parse(JSON.stringify(this.a));
+                delta.subtract(q);
+                return Math.abs(delta.sproduct(this.n));
+            }
         }
         // the stars
         var stars = [];
@@ -93,6 +119,8 @@
         // point of view
         var ego = new RADEtype(0, 0, 0, 0);
         var egoP = new RADEtype(0, 0, 90, 0);
+        // screen
+        var screen = new HPLANEtype(new V3Dtype(1, 0, 0), new V3Dtype(1, 0, 0))
 
         function RADEtoV3D(rade) {
             let a = new V3Dtype;
@@ -116,8 +144,9 @@
             ctx.font = '24px georgia';
             let e = ego.toV3D();
             ctx.fillText('Ego: RA= ' + ego.h.toString() + '.' + ego.dm.toString() + ', DE=' + ego.d.toString() + '.' + ego.m.toString()
-                + ' (' + e.x.toString() + ', ' + e.y.toString() + ', ' + e.z.toString() + ')',
+                + ' (' + e.x.toFixed(2) + ', ' + e.y.toFixed(2) + ', ' + e.z.toFixed(2) + ')',
                 0, 50);
+            ctx.fillText('Distance= ' + screen.distance(e).toFixed(2), 0, 100);
             //ctx.fillText('Ego: (' + e.x.toString() + ', ' + egoDE.m.toString() + ', SpT=' + stars[1].SpT.toString(), 100, 400);
             draw_star(ctx, cwidth / 2, cheight / 2);
             // draw equator
