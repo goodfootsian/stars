@@ -172,7 +172,7 @@
             }
             screen_coordinates(p0x, p0y, n) {
                 let s2 = this.intersection_point(new NAtype(n, new V3Dtype(0, 0, 0)));
-                let s2x = p0x.distance(s2);
+                let s2x = -p0x.distance(s2);
                 let s2y = p0y.distance(s2);
                 return new V3Dtype(s2x, s2y, 0);
             }
