@@ -179,7 +179,7 @@
 
         // point of view
         var ego = new RADEtype(0, 0, 0, 0);
-        var egoP = new RADEtype(0, 0, -90, 0);
+        var egoP = new RADEtype(12, 0, -90, 0);
         var magnification = 400;
 
         function RADEtoV3D(rade) {
@@ -329,6 +329,8 @@
                         break;
                     case 38:
                         //up
+                        ego.d += 180 / Math.PI;
+                        egoP.d -= 180 / Math.PI;
                         break;
                     case 32:
                     //space
