@@ -62,7 +62,7 @@
             }
         }
         class RADEtype {
-            constructor(h = 3, dm = 4, d = 5, m = 6) {
+            constructor(h = 0, dm = 0, d = 0, m = 0) {
                 this.h = h;  // increases when moving left
                 this.dm = dm;  // 10th of a minute
                 this.d = d;    // positive is north, negative is south
@@ -89,6 +89,20 @@
                 this.x = x;
                 this.y = y;
                 this.z = z;
+            }
+            toRADE() {
+                let rade = new RADEtype();
+                let zplane = new NAtype(new V3Dtype(0, 0, 1), new V3Dtype(0, 0, 0));
+                let d = zplane.distance(e);
+                if (d < -1) {
+                    rade.d = 90;
+                } else if (d > 1) {
+                    rade.d = -90;
+                } else { 
+                    rade.d = -Math.asin(d) / Math.PI * 180;
+                }
+                rade.h = Math.atan(e.y / e.x) / Math.PI * 180 / 15;
+                return rade;
             }
             mul(f) {
                 this.x *= f;
@@ -307,10 +321,8 @@
             let p0x = new NAtype(e.xproduct(eP), e);
             let p0y = new NAtype(eP, new V3Dtype(0, 0, 0));
             let screen = new NAtype(e, e);
-            //e.mul(.5);
-            ctx.fillText(ego.toString('Ego') + ', '
-                + e.toString('e') + ', ' + eP.toString('eP') + ', ' + p0x.toString('p0x'),
-                0, 50);
+            ctx.fillText(ego.toString('View') + ', '
+                , 0, 50);
             /*
             ctx.fillText('Distance= ' + screen.distance(e).toFixed(2), 0, 100);
             ctx.fillText('Angle= ' + e.angle(new V3Dtype(1, 0, 0)), 0, 120);
@@ -426,6 +438,8 @@
                             console.log(eP.toString('egoP'))
                             e = m.mmul(e);
                             eP = m.mmul(eP);
+                            ego = e.toRADE();
+                            console.log(ego.toString('egoRADE'))
                             console.log(e.toString('ego'))
                             console.log(eP.toString('egoP'))
                         }
@@ -440,6 +454,7 @@
                             console.log(eP.toString('egoP'))
                             e = m.mmul(e);
                             eP = m.mmul(eP);
+                            ego = e.toRADE();
                             console.log(e.toString('ego'))
                             console.log(eP.toString('egoP'))
                         }
@@ -455,6 +470,7 @@
                             console.log(eP.toString('egoP'))
                             e = m.mmul(e);
                             eP = m.mmul(eP);
+                            ego = e.toRADE();
                             console.log(e.toString('ego'))
                             console.log(eP.toString('egoP'))
                         }
@@ -470,6 +486,7 @@
                             console.log(eP.toString('egoP'))
                             e = m.mmul(e);
                             eP = m.mmul(eP);
+                            ego = e.toRADE();
                             console.log(e.toString('ego'))
                             console.log(eP.toString('egoP'))
                         }
@@ -484,6 +501,7 @@
                             console.log(eP.toString('egoP'))
                             e = m.mmul(e);
                             eP = m.mmul(eP);
+                            ego = e.toRADE();
                             console.log(e.toString('ego'))
                             console.log(eP.toString('egoP'))
                         }
@@ -498,6 +516,7 @@
                             console.log(eP.toString('egoP'))
                             e = m.mmul(e);
                             eP = m.mmul(eP);
+                            ego = e.toRADE();
                             console.log(e.toString('ego'))
                             console.log(eP.toString('egoP'))
                         }
