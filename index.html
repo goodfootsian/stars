@@ -177,11 +177,95 @@
                 return new V3Dtype(s2x, s2y, 0);
             }
         }
-
+        class M3Dtype
+        {
+            constructor(ax = 0, ay = 0, az = 0, bx = 0, by = 0, bz = 0, cx = 0, cy = 0, cz = 0) {
+                this.ax = ax;
+                this.ay = ay;
+                this.az = az;
+                this.bx = bx;
+                this.by = by;
+                this.bz = bz;
+                this.cx = cx;
+                this.cy = cy;
+                this.cz = cz;
+            }
+            create_rot_n(n, a) {
+                // rotate by a around normal vector n
+                this.ax = n.x * n.x * (1 - Math.cos(a)) + Math.cos(a);
+                this.ay = n.y * n.x * (1 - Math.cos(a)) + n.z * Math.sin(a);
+                this.az = n.z * n.x * (1 - Math.cos(a)) - n.y * Math.sin(a);
+                //
+                this.bx = n.x * n.y * (1 - Math.cos(a)) - n.z * Math.sin(a);
+                this.by = n.y * n.y * (1 - Math.cos(a)) + Math.cos(a);
+                this.bz = n.z * n.y * (1 - Math.cos(a)) + n.x * Math.sin(a);
+                //
+                this.cx = n.x * n.z * (1 - Math.cos(a)) + n.y * Math.sin(a);
+                this.cy = n.y * n.z * (1 - Math.cos(a)) - n.x * Math.sin(a);
+                this.cz = n.z * n.z * (1 - Math.cos(a)) + Math.cos(a);
+            }
+            create_rot_z(a) {
+                ax = Math.cos(a);
+                ay = Math.sin(a);
+                az = 0;
+                bx = -Math.sin(a);
+                by = Math.cos(a);
+                bz = 0;
+                cx = 0;
+                cy = 0;
+                cz = 1;
+            }
+            mmul(p) {
+                return new V3Dtype(this.ax * p.x + this.bx * p.y + this.cx * p.z, this.ay * p.x + this.by * p.y + this.cy * p.z, this.az * p.x + this.bz * p.y + this.cz * p.z);
+            }
+            toString(name = "M3D") {
+                s = "";
+                s += name;
+                s += "(";
+                s += to_string(ax);
+                s += ", ";
+                s += to_string(bx);
+                s += ", ";
+                s += to_string(cx);
+                s += ")";
+                s += "\n";
+                s += name;
+                s += "(";
+                s += to_string(ay);
+                s += ", ";
+                s += to_string(by);
+                s += ", ";
+                s += to_string(cy);
+                s += ")";
+                s += "\n";
+                s += name;
+                s += "(";
+                s += to_string(az);
+                s += ", ";
+                s += to_string(bz);
+                s += ", ";
+                s += to_string(cz);
+                s += ")";
+                s += "\n";
+                return s;
+            }
+        }
         // point of view
         var ego = new RADEtype(0, 0, 0, 0);
-        var egoP = new RADEtype(12, 0, 90, 0);
+        var egoP = new RADEtype(0, 0, 90, 0);
+        var e = ego.toV3D();
+        var eP = egoP.toV3D();
         var magnification = 400;
+
+        {
+            let m = new M3Dtype();
+            m.create_rot_n(new V3Dtype(0, 0, 1), Math.PI / 2);
+            let p = new V3Dtype(1, 0, 0);
+            console.log(p.toString('p'))
+            let q = m.mmul(p);
+            console.log(q.toString('q'))
+        }
+
 
         function RADEtoV3D(rade) {
             let a = new V3Dtype;
@@ -219,8 +303,6 @@
             // text
             ctx.fillStyle = 'blue';
             ctx.font = '24px georgia';
-            let e = ego.toV3D();
-            let eP = egoP.toV3D();
             let p0x = new NAtype(e.xproduct(eP), e);
             let p0y = new NAtype(eP, new V3Dtype(0, 0, 0));
             let screen = new NAtype(e, e);
@@ -357,10 +439,12 @@
                     case 107: //num +
                     case 187: //keyboard+
                         // plus
+                        magnification *= 1.2;
                         break;
                     case 109: //num-
                     case 189: //keyboard-
                         //minus
+                        magnification /= 1.2;
                         break;
                 }
                 eventq = 0;
