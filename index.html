@@ -26,6 +26,17 @@
             eventq = event.keyCode;
         });
 
+        // touch events
+        canvas.addEventListener("touchstart", handleStart);
+        canvas.addEventListener("touchend", handleEnd);
+        canvas.addEventListener("touchcancel", handleCancel);
+        canvas.addEventListener("touchmove", handleMove);
+
+        function handleStart() { }
+        function handleEnd() { }
+        function handleCancel() { }
+        function handleMove() { }
+
         var Tschioo = new Audio('Tschioo.mp3');
         var Prrt = new Audio('Prrt.mp3');
         var Bouff = new Audio('Bouff.mp3');
