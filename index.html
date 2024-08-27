@@ -256,6 +256,7 @@
         var e = ego.toV3D();
         var eP = egoP.toV3D();
         var magnification = 400;
+        var rot_deg = 5;
 
         {
             let m = new M3Dtype();
@@ -416,22 +417,90 @@
                 //process event:
                 switch (eventq) {
                     case 37:
-                        //left
-                        ego.h = (ego.h + 1) % 24;
+                        //yaw left
+                        {
+                            // eP is the yaw axis
+                            let m = new M3Dtype();
+                            m.create_rot_n(eP, rot_deg * Math.PI / 180);
+                            console.log(e.toString('ego'))
+                            console.log(eP.toString('egoP'))
+                            e = m.mmul(e);
+                            eP = m.mmul(eP);
+                            console.log(e.toString('ego'))
+                            console.log(eP.toString('egoP'))
+                        }
                         break;
                     case 39:
-                        //right
-                        ego.h = (ego.h + 23) % 24;
+                        //yaw right
+                        {
+                            // eP is the yaw axis
+                            let m = new M3Dtype();
+                            m.create_rot_n(eP, -rot_deg * Math.PI / 180);
+                            console.log(e.toString('ego'))
+                            console.log(eP.toString('egoP'))
+                            e = m.mmul(e);
+                            eP = m.mmul(eP);
+                            console.log(e.toString('ego'))
+                            console.log(eP.toString('egoP'))
+                        }
                         break;
                     case 38:
-                        //up
-                        ego.d += 15;
-                        egoP.d -= 15;
+                        //pitch up
+                        {
+                            let a = e.xproduct(eP)
+                            // a is the pitch axis
+                            let m = new M3Dtype();
+                            m.create_rot_n(a, rot_deg * Math.PI / 180);
+                            console.log(e.toString('ego'))
+                            console.log(eP.toString('egoP'))
+                            e = m.mmul(e);
+                            eP = m.mmul(eP);
+                            console.log(e.toString('ego'))
+                            console.log(eP.toString('egoP'))
+                        }
                         break;
                     case 40:
-                        //down
-                        ego.d -= 15;
-                        egoP.d += 15;
+                        //pitch down
+                        {
+                            let a = e.xproduct(eP)
+                            // a is the pitch axis
+                            let m = new M3Dtype();
+                            m.create_rot_n(a, -rot_deg * Math.PI / 180);
+                            console.log(e.toString('ego'))
+                            console.log(eP.toString('egoP'))
+                            e = m.mmul(e);
+                            eP = m.mmul(eP);
+                            console.log(e.toString('ego'))
+                            console.log(eP.toString('egoP'))
+                        }
+                        break;
+                    case 76: 
+                        //roll left
+                        {
+                            // e is the roll axis
+                            let m = new M3Dtype();
+                            m.create_rot_n(e, rot_deg * Math.PI / 180);
+                            console.log(e.toString('ego'))
+                            console.log(eP.toString('egoP'))
+                            e = m.mmul(e);
+                            eP = m.mmul(eP);
+                            console.log(e.toString('ego'))
+                            console.log(eP.toString('egoP'))
+                        }
+                        break;
+                    case 82: 
+                        //roll right
+                        {
+                            // e is the roll axis
+                            let m = new M3Dtype();
+                            m.create_rot_n(e, -rot_deg * Math.PI / 180);
+                            console.log(e.toString('ego'))
+                            console.log(eP.toString('egoP'))
+                            e = m.mmul(e);
+                            eP = m.mmul(eP);
+                            console.log(e.toString('ego'))
+                            console.log(eP.toString('egoP'))
+                        }
                         break;
                     case 32:
                         //space
