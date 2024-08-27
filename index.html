@@ -343,11 +343,25 @@
                         break;
                     case 38:
                         //up
-                        ego.d += 180 / Math.PI;
-                        egoP.d -= 180 / Math.PI;
+                        ego.d += 15;
+                        egoP.d -= 15;
+                        break;
+                    case 40:
+                        //down
+                        ego.d -= 15;
+                        egoP.d += 15;
                         break;
                     case 32:
-                    //space
+                        //space
+                        break;
+                    case 107: //num +
+                    case 187: //keyboard+
+                        // plus
+                        break;
+                    case 109: //num-
+                    case 189: //keyboard-
+                        //minus
+                        break;
                 }
                 eventq = 0;
                 // draw
