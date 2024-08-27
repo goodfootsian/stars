@@ -140,6 +140,7 @@
             constructor(n, a) {
                 this.n = n;   // nota: |n| = 1
                 this.a = a;   // a point in the plane / line
+                this.l = 0;   // l = lambda used to indicate whether a line intersects a plane in the direction of the normal vector of the line
             }
             toString(name = 'NAtype') {
                 let s = name + '[n=' + this.n.toString() + ', ' + this.a.toString() + ']';
@@ -166,8 +167,8 @@
                 let cos_g = this.n.sproduct(line.n) / 1 / 1;
                 let a = this.a.clone();
                 a.subtract(line.a);
-                let l = this.n.sproduct(a) / cos_g;
-                return line.x(l);
+                this.l = this.n.sproduct(a) / cos_g;
+                return line.x(this.l);
             }
             screen_coordinates(p0x, p0y, n) {
                 let s2 = this.intersection_point(new NAtype(n, new V3Dtype(0, 0, 0)));
@@ -179,7 +180,7 @@
 
         // point of view
         var ego = new RADEtype(0, 0, 0, 0);
-        var egoP = new RADEtype(12, 0, -90, 0);
+        var egoP = new RADEtype(12, 0, 90, 0);
         var magnification = 400;
 
         function RADEtoV3D(rade) {
@@ -236,7 +237,9 @@
             for (let i = 0; i < 24; ++i) {
                 for (let j = 0; j < 24; ++j) {
                     let equator_milestone = new RADEtype(i, 0, j * 15, 0).toV3D();
+                    let l = 0;
                     let s3 = screen.screen_coordinates(p0x, p0y, equator_milestone);
+                    if (screen.l < 0) continue;
                     /*
                     ctx.fillStyle = 'blue';
                     ctx.fillText('RA=' + i
@@ -251,10 +254,17 @@
             }
             // draw ecliptic
             // draw stars
+            let cnt = 0;
+            let hit = 0;
             for (let i = 0; i < stars.length; ++i) {
+                cnt++;
+                //if (stars[i].h > 12) continue;
                 let starRADE = new RADEtype(stars[i].h, stars[i].dm, stars[i].d, stars[i].m);
                 let starpoint = starRADE.toV3D();
-                let s3 = screen.screen_coordinates(p0x, p0y, starpoint);
+                let l = 0;
+                let s3 = screen.screen_coordinates(p0x, p0y, starpoint, l);
+                if (screen.l < 0) continue;
+                hit++;
                 /*
                 ctx.fillStyle = 'orange';
                 ctx.fillText('ix=' + i
@@ -265,6 +275,10 @@
                     */
                 draw_star(ctx, stars[i].SpT, stars[i].Ptm, cwidth / 2 + s3.x * magnification, cheight / 2 + s3.y * magnification);
             }
+            ctx.fillStyle = 'orange';
+            ctx.fillText('cnt=' + cnt.toString()
+                + ", hit=" + hit.toString()
+                , 300, 150);
         }
 
         const st_insertcoin = 0;
