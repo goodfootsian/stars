@@ -49,7 +49,7 @@
         // my classes
         class RAtype {
             constructor(h = 3, dm = 4) {
-                this.h = h;  // [0..23] increases when moving left
+                this.h = h;  // [0..23] increases when moving left / east
                 this.dm = dm;  // 10th of a minute
             }
         }
@@ -201,12 +201,14 @@
             return a;
         }
         function draw_star(ctx, color, mag, x, y) {
-            mag = Math.exp(1 - mag);
+            //mag = Math.exp(1 - mag);
+            let sz = 1;
+            sz = 3 - mag / 2;
             // fill with background color
             ctx.fillStyle = color;
             //ctx.fillRect(x, y, 10, 10);
             ctx.beginPath();
-            ctx.arc(x, y, mag, 0, 2 * Math.PI);
+            ctx.arc(x, y, sz, 0, 2 * Math.PI);
             ctx.fill();
         }
         function draw_field(ctx) {
@@ -244,7 +246,7 @@
                     */
                     let mag = 0;
                     if (i == 0) mag = -1;
-                    draw_star(ctx, 'yellow', 3, cwidth / 2 + s3.x / 6 * cwidth / 2, cheight / 2 + s3.y / 6 * cwidth);
+                    draw_star(ctx, 'rgb(125, 125, 125)', 4, cwidth / 2 + s3.x / 6 * cwidth / 2, cheight / 2 + s3.y / 6 * cwidth);
                 }
             }
             /*
