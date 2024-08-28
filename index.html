@@ -101,7 +101,21 @@
                 } else { 
                     rade.d = -Math.asin(d) / Math.PI * 180;
                 }
-                rade.h = Math.atan(e.y / e.x) / Math.PI * 180 / 15;
+                let a = 0;
+                if (this.x > 0) {
+                    a = Math.atan(this.y / this.x) / Math.PI * 180;
+                } else if (this.x < 0 && this.y >= 0) {
+                    a = Math.atan(this.y / this.x) / Math.PI * 180 + 180;
+                } else if (this.x < 0 && this.y < 0) {
+                    a = Math.atan(this.y / this.x) / Math.PI * 180 - 180;
+                } else if (this.x == 0 && this.y > 0) {
+                    a = 90;
+                } else if (this.x == 0 && this.y < 0) {
+                    a = -90;
+                }
+                console.log(a.toFixed(1));
+                if (a < 0) a += 360;
+                rade.h = a / 15;
                 return rade;
             }
             mul(f) {
@@ -145,6 +159,30 @@
                 let s = name + '(' + this.x.toFixed(2) + ', ' + this.y.toFixed(2) + ', ' + this.z.toFixed(2) + ')';
                 return s;
 
+            }
+            toRGB() {
+                let s = '#' + Math.trunc(this.x).toString(16).padStart(2, '0') + Math.trunc(this.y).toString(16).padStart(2, '0') + Math.trunc(this.z).toString(16).padStart(2, '0');
+                return s;
+            }
+        }
+        {
+            for (let i = 0; i < 360; i += 10) {
+                let x = Math.cos(i / 180 * Math.PI);
+                let y = Math.sin(i / 180 * Math.PI);
+                let a = 0;
+                if (x > 0) {
+                    a = Math.atan(y / x) / Math.PI * 180;
+                } else if (x < 0 && y >= 0) {
+                    a = Math.atan(y / x) / Math.PI * 180 + 180;
+                } else if (x < 0 && y < 0) {
+                    a = Math.atan(y / x) / Math.PI * 180 - 180;
+                } else if (x == 0 && y > 0) {
+                    a = 90;
+                } else if (x == 0 && y < 0) {
+                    a = -90;
+                }
+                if (a < 0) a += 360;
+                console.log(i.toFixed(2) + ", " + x.toFixed(2) + ", " + y.toFixed(2) + ", " + a.toFixed(2) + ", ");
             }
         }
         class NAtype {
@@ -271,15 +309,15 @@
         var eP = egoP.toV3D();
         var magnification = 600;
         var rot_deg = 5;
-
         {
-            let m = new M3Dtype();
-            m.create_rot_n(new V3Dtype(0, 0, 1), Math.PI / 2);
-            let p = new V3Dtype(1, 0, 0);
-            console.log(p.toString('p'))
-            let q = m.mmul(p);
-            console.log(q.toString('q'))
+            for (i = 0; i < 24; ++i) {
+                let i1 = new RADEtype(i, 0, 0, 0);
+                let i2 = i1.toV3D();
+                let i3 = i2.toRADE();
+                console.log(i1.toString('RADE') + i2.toString('xy') + i3.toString('RADE'));
+            }
         }
+
 
 
         function RADEtoV3D(rade) {
@@ -287,26 +325,56 @@
             //r = cos();
             return a;
         }
+        function get_star_radius(mag) {
+            /*
+            let r = 1;
+            if (mag < 2) r = 1;
+            if (mag < 1) r = 2;
+            if (mag < 0) r = 3;
+            if (mag < -1) r = 4;
+            */
+            let ulux = 1e8 * Math.pow(10, -0.4 * (mag + 14.2));
+            let r = Math.sqrt(ulux / Math.PI);
+            return r;
+        }
+        {
+            for (let i = -2; i < 7; ++i) {
+                console.log(i.toFixed(1) + ' => ' + get_star_radius(i).toFixed(2))
+            }
+        }
+        function getRGB(color, mag) {
+            let rgb = 0;
+            switch (color.charAt()) {
+                case 'O': rgb = new V3Dtype(200, 200, 255); break;
+                case 'B': rgb = new V3Dtype(220, 220, 255); break;
+                case 'A': rgb = new V3Dtype(230, 230, 255); break;
+                case 'F': rgb = new V3Dtype(255, 255, 200); break;
+                case 'G': rgb = new V3Dtype(250, 250, 100); break;
+                case 'K': rgb = new V3Dtype(255, 200, 100); break;
+                case 'M': rgb = new V3Dtype(255, 200, 200); break;
+                default: rgb = new V3Dtype(200, 200, 200); break;
+            }
+            if (mag > 4) rgb.mul(.7);
+            if (mag > 5) rgb.mul(.7);
+            if (mag > 6) rgb.mul(.7);
+            let s = rgb.toRGB();
+            return s;
+        }
+        {
+            console.log((new V3Dtype(255, 255, 255)).toRGB());
+            console.log((new V3Dtype(5, 5, 5)).toRGB());
+        }
         function draw_star(ctx, color, mag, x, y) {
+            //if (mag < 5) return;
             //mag = Math.exp(1 - mag);
             let ulux = 1e8 * Math.pow(10, -0.4 * (mag + 14.2));
-            //ulux = pi*r*r
-            //r = sqrt(ulux/pi)
-            let sz = Math.sqrt(ulux / Math.PI);
+            //let sz = Math.sqrt(ulux / Math.PI);
+            let sz = get_star_radius(mag);
             //sz = 1;
             //sz = 3 - mag / 2;
             //if (mag < 2) ++sz;
             // Spectral Type
-            switch (color.charAt()) {
-                case 'O': ctx.fillStyle = 'rgb(200, 200, 255)'; break;
-                case 'B': ctx.fillStyle = 'rgb(220, 220, 255)'; break;
-                case 'A': ctx.fillStyle = 'rgb(230, 230, 255)'; break;
-                case 'F': ctx.fillStyle = 'rgb(255, 255, 200)'; break;
-                case 'G': ctx.fillStyle = 'rgb(250, 250, 100)'; break;
-                case 'K': ctx.fillStyle = 'rgb(255, 200, 100)'; break;
-                case 'M': ctx.fillStyle = 'rgb(255, 200, 200)'; break;
-                default: ctx.fillStyle = 'rgb(200, 200, 200)'; break;
-            }
+            ctx.fillStyle = getRGB(color, mag);
             ctx.beginPath();
             ctx.arc(x, y, sz, 0, 2 * Math.PI);
             ctx.fill();
@@ -348,8 +416,6 @@
             let p0x = new NAtype(e.xproduct(eP), e);
             let p0y = new NAtype(eP, new V3Dtype(0, 0, 0));
             let screen = new NAtype(e, e);
-            ctx.fillText(ego.toString('View') + ', '
-                , 0, 50);
             /*
             ctx.fillText('Distance= ' + screen.distance(e).toFixed(2), 0, 100);
             ctx.fillText('Angle= ' + e.angle(new V3Dtype(1, 0, 0)), 0, 120);
@@ -401,9 +467,9 @@
                 draw_star(ctx, stars[i].SpT, stars[i].Ptm, cwidth / 2 + s3.x * magnification, cheight / 2 + s3.y * magnification);
             }
             ctx.fillStyle = 'orange';
-            ctx.fillText('cnt=' + cnt.toString()
-                + ", hit=" + hit.toString()
-                , 300, 150);
+            ctx.fillText(ego.toString('View')
+                + ', stars=' + cnt.toString()
+                , 0, 50);
         }
 
         const st_insertcoin = 0;
@@ -412,7 +478,6 @@
         var status = st_insertcoin;
         function loop() {
             const ctx = canvas.getContext('2d');
-            //console.log('status ' + status + ' event ' + eventq + ' c_part ' + c_part + ' c_height ' + c_height);
             if (status == st_insertcoin) {
                 //process event:
                 switch (eventq) {
@@ -464,14 +529,9 @@
                             // eP is the yaw axis
                             let m = new M3Dtype();
                             m.create_rot_n(eP, rot_deg * Math.PI / 180);
-                            console.log(e.toString('ego'))
-                            console.log(eP.toString('egoP'))
                             e = m.mmul(e);
                             eP = m.mmul(eP);
                             ego = e.toRADE();
-                            console.log(ego.toString('egoRADE'))
-                            console.log(e.toString('ego'))
-                            console.log(eP.toString('egoP'))
                         }
                         break;
                     case 39:
@@ -480,13 +540,9 @@
                             // eP is the yaw axis
                             let m = new M3Dtype();
                             m.create_rot_n(eP, -rot_deg * Math.PI / 180);
-                            console.log(e.toString('ego'))
-                            console.log(eP.toString('egoP'))
                             e = m.mmul(e);
                             eP = m.mmul(eP);
                             ego = e.toRADE();
-                            console.log(e.toString('ego'))
-                            console.log(eP.toString('egoP'))
                         }
                         break;
                     case 38:
@@ -496,13 +552,9 @@
                             // a is the pitch axis
                             let m = new M3Dtype();
                             m.create_rot_n(a, rot_deg * Math.PI / 180);
-                            console.log(e.toString('ego'))
-                            console.log(eP.toString('egoP'))
                             e = m.mmul(e);
                             eP = m.mmul(eP);
                             ego = e.toRADE();
-                            console.log(e.toString('ego'))
-                            console.log(eP.toString('egoP'))
                         }
                         break;
                     case 40:
@@ -512,13 +564,9 @@
                             // a is the pitch axis
                             let m = new M3Dtype();
                             m.create_rot_n(a, -rot_deg * Math.PI / 180);
-                            console.log(e.toString('ego'))
-                            console.log(eP.toString('egoP'))
                             e = m.mmul(e);
                             eP = m.mmul(eP);
                             ego = e.toRADE();
-                            console.log(e.toString('ego'))
-                            console.log(eP.toString('egoP'))
                         }
                         break;
                     case 76: 
@@ -527,13 +575,9 @@
                             // e is the roll axis
                             let m = new M3Dtype();
                             m.create_rot_n(e, rot_deg * Math.PI / 180);
-                            console.log(e.toString('ego'))
-                            console.log(eP.toString('egoP'))
                             e = m.mmul(e);
                             eP = m.mmul(eP);
                             ego = e.toRADE();
-                            console.log(e.toString('ego'))
-                            console.log(eP.toString('egoP'))
                         }
                         break;
                     case 82: 
@@ -542,13 +586,9 @@
                             // e is the roll axis
                             let m = new M3Dtype();
                             m.create_rot_n(e, -rot_deg * Math.PI / 180);
-                            console.log(e.toString('ego'))
-                            console.log(eP.toString('egoP'))
                             e = m.mmul(e);
                             eP = m.mmul(eP);
                             ego = e.toRADE();
-                            console.log(e.toString('ego'))
-                            console.log(eP.toString('egoP'))
                         }
                         break;
                     case 32:
