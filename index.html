@@ -443,9 +443,15 @@
                     draw_line_on_screen(ctx, new RADEtype(6, 0, -88, 0), new RADEtype(18, 0, -88, 0), 6, "G2");
                     draw_text_on_screen(ctx, new RADEtype(0, 0, -90, 0), 1, "G2", "South Pole", 6);
                 }
-                // draw equator
+                // draw equator and wendekreise
                 for (let i = 0; i < 360; i += 2) {
+                    const ecliptic_obliquity = 23.4; // degrees
+                    const polar_de = 66.5; // degrees
                     draw_line_on_screen(ctx, new RADEtype(i / 15, 0, 0, 0), new RADEtype((i + 1) / 15, 0, 0, 0), 6, "G2");
+                    draw_line_on_screen(ctx, new RADEtype(i / 15, 0, ecliptic_obliquity, 0), new RADEtype((i + 1) / 15, 0, ecliptic_obliquity, 0), 6, "B2");
+                    draw_line_on_screen(ctx, new RADEtype(i / 15, 0, -ecliptic_obliquity, 0), new RADEtype((i + 1) / 15, 0, -ecliptic_obliquity, 0), 6, "B2");
+                    draw_line_on_screen(ctx, new RADEtype(i / 15, 0, polar_de, 0), new RADEtype((i + 1) / 15, 0, polar_de, 0), 6, "B2");
+                    draw_line_on_screen(ctx, new RADEtype(i / 15, 0, -polar_de, 0), new RADEtype((i + 1) / 15, 0, -polar_de, 0), 6, "B2");
                 }
                 // 0 and 12 meridian
                 for (let i = -90; i < 90; i += 2) {
