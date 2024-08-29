@@ -354,22 +354,15 @@
             console.log((new V3Dtype(255, 255, 255)).toRGB());
             console.log((new V3Dtype(5, 5, 5)).toRGB());
         }
-        function draw_star(ctx, color, mag, x, y) {
-            //if (mag < 5) return;
-            //mag = Math.exp(1 - mag);
+        function draw_star(ctx, mag, color, x, y) {
             let ulux = 1e8 * Math.pow(10, -0.4 * (mag + 14.2));
-            //let sz = Math.sqrt(ulux / Math.PI);
             let sz = get_star_radius(mag);
-            //sz = 1;
-            //sz = 3 - mag / 2;
-            //if (mag < 2) ++sz;
-            // Spectral Type
             ctx.fillStyle = getRGB(color, mag);
             ctx.beginPath();
             ctx.arc(x, y, sz, 0, 2 * Math.PI);
             ctx.fill();
         }
-        function draw_line(ctx, color, mag, x0, y0, x1, y1) {
+        function draw_line(ctx, mag, color, x0, y0, x1, y1) {
             //mag = Math.exp(1 - mag);
             let ulux = 1e8 * Math.pow(10, -0.4 * (mag + 14.2));
             //ulux = pi*r*r
@@ -396,6 +389,23 @@
             // Draw the Path
             ctx.stroke();
         }
+        var p0x = 0;
+        var p0y = 0;
+        var screen = 0;
+        function draw_line_on_screen(ctx, p1, p2, mag, color) {
+            let s1c = p1.toV3D();
+            let s2c = p2.toV3D();
+            let s1 = screen.screen_coordinates(p0x, p0y, s1c);
+            let s2 = screen.screen_coordinates(p0x, p0y, s2c);
+            if (screen.l < 0) return;
+            draw_line(ctx, 1, 'G2', cwidth / 2 + s1.x * magnification, cheight / 2 + s1.y * magnification, cwidth / 2 + s2.x * magnification, cheight / 2 + s2.y * magnification);
+        }
+        function draw_star_on_screen(ctx, p1, mag, color) {
+            let s1c = p1.toV3D();
+            let s1 = screen.screen_coordinates(p0x, p0y, s1c);
+            if (screen.l < 0) return;
+            draw_star(ctx, mag, color, cwidth / 2 + s1.x * magnification, cheight / 2 + s1.y * magnification);
+        }
         function draw_field(ctx) {
             // fill with background color
             ctx.fillStyle = 'rgb(5, 5, 25)';
@@ -403,16 +413,16 @@
             // text
             ctx.fillStyle = 'blue';
             ctx.font = '24px georgia';
-            let p0x = new NAtype(e.xproduct(eP), e);
-            let p0y = new NAtype(eP, new V3Dtype(0, 0, 0));
-            let screen = new NAtype(e, e);
-            /*
-            ctx.fillText('Distance= ' + screen.distance(e).toFixed(2), 0, 100);
-            ctx.fillText('Angle= ' + e.angle(new V3Dtype(1, 0, 0)), 0, 120);
-            //ctx.fillText('Ego: (' + e.x.toString() + ', ' + egoDE.m.toString() + ', SpT=' + stars[1].SpT.toString(), 100, 400);
-            */
+            p0x = new NAtype(e.xproduct(eP), e);
+            p0y = new NAtype(eP, new V3Dtype(0, 0, 0));
+            screen = new NAtype(e, e);
+            // draw north pole
+            {
+                draw_line_on_screen(ctx, new RADEtype(0, 0, 88, 0), new RADEtype(12, 0, 88, 0), 1, "G2");
+                draw_line_on_screen(ctx, new RADEtype(6, 0, 88, 0), new RADEtype(18, 0, 88, 0), 1, "G2");
+                //draw_star_on_screen(ctx, new RADEtype(0, 0, 90, 0), 1, "G2");
+            }
             // draw equator
-
             for (let DE = -80; DE < 90; DE += 10) {
                 for (let i = 0; i < 25; ++i) {
                     let equator_milestone = new RADEtype(i, 0, DE, 0).toV3D();
@@ -454,7 +464,8 @@
                     + ', ' + s3.toString()
                     , 300, 150 + i * 20);
                     */
-                draw_star(ctx, stars[i].SpT, stars[i].Ptm, cwidth / 2 + s3.x * magnification, cheight / 2 + s3.y * magnification);
+                //draw_star(ctx, stars[i].Ptm, stars[i].SpT, cwidth / 2 + s3.x * magnification, cheight / 2 + s3.y * magnification);
+                draw_star_on_screen(ctx, starRADE, stars[i].Ptm, stars[i].SpT);
             }
             ctx.fillStyle = 'orange';
             ctx.fillText(ego.toString('View')
