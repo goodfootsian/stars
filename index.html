@@ -306,6 +306,8 @@
         var e = ego.toV3D();
         var eP = egoP.toV3D();
         var magnification = 600;
+        var show_grid = true;
+        var show_names = true;
         var rot_deg = 5;
         {
             for (i = 0; i < 360; i += 5) {
@@ -406,19 +408,17 @@
             if (screen.l < 0) return;
             draw_star(ctx, mag, color, cwidth / 2 + s1.x * magnification, cheight / 2 + s1.y * magnification);
         }
-        function draw_text_on_screen(ctx, p1, mag, color, text) {
+        function draw_text_on_screen(ctx, p1, mag, color, text, magStar) {
             let s1c = p1.toV3D();
             let s1 = screen.screen_coordinates(p0x, p0y, s1c);
             if (screen.l < 0) return;
             //draw_star(ctx, mag, color, cwidth / 2 + s1.x * magnification, cheight / 2 + s1.y * magnification);
             let sz = get_star_radius(mag);
-            ctx.fillStyle = getRGB(color, mag);
+            ctx.fillStyle = getRGB(color, magStar);
             ctx.font = '12px georgia';
             ctx.textAlign = "left";
             ctx.textBaseline = 'top'
-            ctx.fillText(text, cwidth / 2 + s1.x * magnification, cheight / 2 + s1.y * magnification);
-
-
+            ctx.fillText(text, cwidth / 2 + s1.x * magnification + sz, cheight / 2 + s1.y * magnification + sz);
         }
         function draw_field(ctx) {
             // fill with background color
@@ -430,26 +430,28 @@
             p0x = new NAtype(e.xproduct(eP), e);
             p0y = new NAtype(eP, new V3Dtype(0, 0, 0));
             screen = new NAtype(e, e);
-            // draw north pole
-            {
-                draw_line_on_screen(ctx, new RADEtype(0, 0, 88, 0), new RADEtype(12, 0, 88, 0), 1, "G2");
-                draw_line_on_screen(ctx, new RADEtype(6, 0, 88, 0), new RADEtype(18, 0, 88, 0), 1, "G2");
-                draw_text_on_screen(ctx, new RADEtype(0, 0, 90, 0), 1, "G2", "North Pole");
-            }
-            // draw south pole
-            {
-                draw_line_on_screen(ctx, new RADEtype(0, 0, -88, 0), new RADEtype(12, 0, -88, 0), 1, "G2");
-                draw_line_on_screen(ctx, new RADEtype(6, 0, -88, 0), new RADEtype(18, 0, -88, 0), 1, "G2");
-                draw_text_on_screen(ctx, new RADEtype(0, 0, -90, 0), 1, "G2", "South Pole");
-            }
-            // draw equator
-            for (let i = 0; i < 360; i += 2) {
-                draw_line_on_screen(ctx, new RADEtype(i / 15, 0, 0, 0), new RADEtype((i + 1) / 15, 0, 0, 0), 6, "G2");
-            }
-            // 0 and 12 meridian
-            for (let i = -90; i < 90; i += 2) {
-                draw_line_on_screen(ctx, new RADEtype(0, 0, i, 0), new RADEtype(0, 0, i + 1, 0), 6, "G2");
-                draw_line_on_screen(ctx, new RADEtype(12, 0, i, 0), new RADEtype(12, 0, i + 1, 0), 6, "G2");
+            if (show_grid) {
+                // draw north pole
+                {
+                    draw_line_on_screen(ctx, new RADEtype(0, 0, 88, 0), new RADEtype(12, 0, 88, 0), 6, "G2");
+                    draw_line_on_screen(ctx, new RADEtype(6, 0, 88, 0), new RADEtype(18, 0, 88, 0), 6, "G2");
+                    draw_text_on_screen(ctx, new RADEtype(0, 0, 90, 0), 1, "G2", "North Pole", 6);
+                }
+                // draw south pole
+                {
+                    draw_line_on_screen(ctx, new RADEtype(0, 0, -88, 0), new RADEtype(12, 0, -88, 0), 6, "G2");
+                    draw_line_on_screen(ctx, new RADEtype(6, 0, -88, 0), new RADEtype(18, 0, -88, 0), 6, "G2");
+                    draw_text_on_screen(ctx, new RADEtype(0, 0, -90, 0), 1, "G2", "South Pole", 6);
+                }
+                // draw equator
+                for (let i = 0; i < 360; i += 2) {
+                    draw_line_on_screen(ctx, new RADEtype(i / 15, 0, 0, 0), new RADEtype((i + 1) / 15, 0, 0, 0), 6, "G2");
+                }
+                // 0 and 12 meridian
+                for (let i = -90; i < 90; i += 2) {
+                    draw_line_on_screen(ctx, new RADEtype(0, 0, i, 0), new RADEtype(0, 0, i + 1, 0), 6, "G2");
+                    draw_line_on_screen(ctx, new RADEtype(12, 0, i, 0), new RADEtype(12, 0, i + 1, 0), 6, "G2");
+                }
             }
             // draw ecliptic
             // draw stars
@@ -465,8 +467,8 @@
                 if (screen.l < 0) continue;
                 hit++;
                 draw_star_on_screen(ctx, starRADE, stars[i].Ptm, stars[i].SpT);
-                if (stars[i].name.length && stars[i].Ptm < 2.5) {
-                    draw_text_on_screen(ctx, starRADE, 6, stars[i].SpT, stars[i].name);
+                if (show_names && stars[i].name.length && stars[i].Ptm < 2.5) {
+                    draw_text_on_screen(ctx, starRADE, stars[i].Ptm, stars[i].SpT, stars[i].name, 6);
                 }
             }
             ctx.fillStyle = 'orange';
@@ -572,7 +574,13 @@
                             ego = e.toRADE();
                         }
                         break;
-                    case 76: 
+                    case 71: // 'G':
+                        show_grid = !show_grid;
+                        break;
+                    case 78: // 'N':
+                        show_names = !show_names;
+                        break;
+                    case 76: // 'L'
                         //roll left
                         {
                             // e is the roll axis
