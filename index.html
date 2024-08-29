@@ -71,12 +71,17 @@
             toString(name = 'RADE') {
                 let s = name + '(RA=' + this.h.toFixed(2) + ', dm=' + this.dm.toFixed(2) + ', DE=' + this.d.toFixed(2) + ', m=' + this.m.toFixed(2) + ')';
                 return s;
-
             }
             toV3D() {
                 let a = new V3Dtype(0, 0,);
                 let ra = (this.h + this.dm / 600) / 24 * 2 * Math.PI;
-                let de = (this.d + this.m / 60) / 360 * 2 * Math.PI;
+                let de = (this.d) / 360 * 2 * Math.PI;
+                let de_mdec = (this.m / 60) / 360 * 2 * Math.PI;
+                if (de < 0) {
+                    de -= de_mdec;
+                } else {
+                    de += de_mdec;
+                }
                 let r = Math.cos(de);
                 a.z = Math.sin(de);
                 a.x = r * Math.cos(ra);
@@ -92,6 +97,7 @@
             }
             toRADE() {
                 let rade = new RADEtype();
+                // DE
                 let zplane = new NAtype(new V3Dtype(0, 0, 1), new V3Dtype(0, 0, 0));
                 let d = zplane.distance(e);
                 if (d < -1) {
@@ -101,6 +107,7 @@
                 } else { 
                     rade.d = -Math.asin(d) / Math.PI * 180;
                 }
+                // RA
                 let a = 0;
                 if (this.x > 0) {
                     a = Math.atan(this.y / this.x) / Math.PI * 180;
@@ -113,9 +120,12 @@
                 } else if (this.x == 0 && this.y < 0) {
                     a = -90;
                 }
-                console.log(a.toFixed(1));
                 if (a < 0) a += 360;
                 rade.h = a / 15;
+                rade.dm = rade.h;
+                rade.h = Math.trunc(rade.h);
+                rade.dm -= rade.h;
+                rade.dm *= 600;
                 return rade;
             }
             mul(f) {
@@ -163,26 +173,6 @@
             toRGB() {
                 let s = '#' + Math.trunc(this.x).toString(16).padStart(2, '0') + Math.trunc(this.y).toString(16).padStart(2, '0') + Math.trunc(this.z).toString(16).padStart(2, '0');
                 return s;
-            }
-        }
-        {
-            for (let i = 0; i < 360; i += 10) {
-                let x = Math.cos(i / 180 * Math.PI);
-                let y = Math.sin(i / 180 * Math.PI);
-                let a = 0;
-                if (x > 0) {
-                    a = Math.atan(y / x) / Math.PI * 180;
-                } else if (x < 0 && y >= 0) {
-                    a = Math.atan(y / x) / Math.PI * 180 + 180;
-                } else if (x < 0 && y < 0) {
-                    a = Math.atan(y / x) / Math.PI * 180 - 180;
-                } else if (x == 0 && y > 0) {
-                    a = 90;
-                } else if (x == 0 && y < 0) {
-                    a = -90;
-                }
-                if (a < 0) a += 360;
-                console.log(i.toFixed(2) + ", " + x.toFixed(2) + ", " + y.toFixed(2) + ", " + a.toFixed(2) + ", ");
             }
         }
         class NAtype {
@@ -310,8 +300,8 @@
         var magnification = 600;
         var rot_deg = 5;
         {
-            for (i = 0; i < 24; ++i) {
-                let i1 = new RADEtype(i, 0, 0, 0);
+            for (i = 0; i < 360; i += 5) {
+                let i1 = new RADEtype(i / 360 * 24, 0, 0, 0);
                 let i2 = i1.toV3D();
                 let i3 = i2.toRADE();
                 console.log(i1.toString('RADE') + i2.toString('xy') + i3.toString('RADE'));
