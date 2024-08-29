@@ -398,6 +398,11 @@
             let s1 = screen.screen_coordinates(p0x, p0y, s1c);
             let s2 = screen.screen_coordinates(p0x, p0y, s2c);
             if (screen.l < 0) return;
+            stest = s1.clone();
+            stest.subtract(s2);
+            if (stest.abs() > 1000) {
+                console.log(stest.toString("overflow"))
+            }
             draw_line(ctx, 1, 'G2', cwidth / 2 + s1.x * magnification, cheight / 2 + s1.y * magnification, cwidth / 2 + s2.x * magnification, cheight / 2 + s2.y * magnification);
         }
         function draw_star_on_screen(ctx, p1, mag, color) {
@@ -426,7 +431,7 @@
             }
             // draw equator
             for (let i = 0; i < 360; i += 2) {
-                //draw_line_on_screen(ctx, new RADEtype(i / 15, 0, 0, 0), new RADEtype((i + 1)/15, 0, 0, 0), 1, "G2");
+                draw_line_on_screen(ctx, new RADEtype(i / 15, 0, 0, 0), new RADEtype((i + 1)/15, 0, 0, 0), 1, "G2");
             }
             // draw ecliptic
             // draw stars
