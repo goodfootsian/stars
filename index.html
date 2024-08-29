@@ -434,9 +434,13 @@
             {
                 draw_line_on_screen(ctx, new RADEtype(0, 0, 88, 0), new RADEtype(12, 0, 88, 0), 1, "G2");
                 draw_line_on_screen(ctx, new RADEtype(6, 0, 88, 0), new RADEtype(18, 0, 88, 0), 1, "G2");
+                draw_text_on_screen(ctx, new RADEtype(0, 0, 90, 0), 1, "G2", "North Pole");
+            }
+            // draw south pole
+            {
                 draw_line_on_screen(ctx, new RADEtype(0, 0, -88, 0), new RADEtype(12, 0, -88, 0), 1, "G2");
                 draw_line_on_screen(ctx, new RADEtype(6, 0, -88, 0), new RADEtype(18, 0, -88, 0), 1, "G2");
-                draw_text_on_screen(ctx, new RADEtype(0, 0, 90, 0), 1, "G2", "North Pole");
+                draw_text_on_screen(ctx, new RADEtype(0, 0, -90, 0), 1, "G2", "South Pole");
             }
             // draw equator
             for (let i = 0; i < 360; i += 2) {
