@@ -119,6 +119,12 @@
                 } else { 
                     rade.d = -Math.asin(d) / Math.PI * 180;
                 }
+                //console.log(rade.d.toFixed(2) + " = ");
+                let dtrunc = Math.trunc(rade.d);
+                let dfrac = Math.abs(rade.d - dtrunc);
+                rade.d = dtrunc;
+                rade.m = dfrac * 60;
+                //console.log(rade.d.toFixed(2) + " deg, " + rade.m.toFixed(2) + " minutes");
                 // RA
                 let a = 0;
                 if (this.x > 0) {
