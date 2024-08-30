@@ -321,6 +321,7 @@
         var show_grid = true;
         var show_names = true;
         var rot_deg = 5;
+        /*
         {
             for (i = 0; i < 360; i += 5) {
                 let i1 = new RADEtype(i / 360 * 24, 0, 0, 0);
@@ -329,6 +330,7 @@
                 console.log(i1.toString('RADE') + i2.toString('xy') + i3.toString('RADE'));
             }
         }
+        */
         {
             let n = new V3Dtype(0.99, 0.13, 0.06);
             let rade = n.toRADE();
@@ -374,10 +376,6 @@
             if (mag > 6) rgb.mul(.6);
             let s = rgb.toRGB();
             return s;
-        }
-        {
-            console.log((new V3Dtype(255, 255, 255)).toRGB());
-            console.log((new V3Dtype(5, 5, 5)).toRGB());
         }
         function draw_star(ctx, mag, color, x, y) {
             //let ulux = 1e8 * Math.pow(10, -0.4 * (mag + 14.2));
@@ -491,7 +489,7 @@
                         let pos1 = rot2deg.mmul(pos0);
                         let pos0RADE = pos0.toRADE();
                         let pos1RADE = pos1.toRADE();
-                        console.log(pos0RADE.toString() + ' ' + pos0.toString() + ' => ' + pos1RADE.toString() + ' ' + pos1.toString());
+                        //console.log(pos0RADE.toString() + ' ' + pos0.toString() + ' => ' + pos1RADE.toString() + ' ' + pos1.toString());
                         draw_line_on_screen(ctx, pos0RADE, pos1RADE, 6, "O2");
                         pos0 = rot2deg.mmul(pos1);
                     }
