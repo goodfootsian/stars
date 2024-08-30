@@ -99,7 +99,7 @@
                 let rade = new RADEtype();
                 // DE
                 let zplane = new NAtype(new V3Dtype(0, 0, 1), new V3Dtype(0, 0, 0));
-                let d = zplane.distance(e);
+                let d = zplane.distance(this);
                 if (d < -1) {
                     rade.d = 90;
                 } else if (d > 1) {
@@ -317,8 +317,11 @@
                 console.log(i1.toString('RADE') + i2.toString('xy') + i3.toString('RADE'));
             }
         }
-
-
+        {
+            let n = new V3Dtype(0.99, 0.13, 0.06);
+            let rade = n.toRADE();
+            console.log(rade.toString());
+        }
 
         function RADEtoV3D(rade) {
             let a = new V3Dtype;
@@ -462,6 +465,30 @@
                     draw_line_on_screen(ctx, new RADEtype(i / 15, 0, -ecliptic_obliquity, 0), new RADEtype((i + 1) / 15, 0, -ecliptic_obliquity, 0), 6, "B2");
                     draw_line_on_screen(ctx, new RADEtype(i / 15, 0, polar_de, 0), new RADEtype((i + 1) / 15, 0, polar_de, 0), 6, "B2");
                     draw_line_on_screen(ctx, new RADEtype(i / 15, 0, -polar_de, 0), new RADEtype((i + 1) / 15, 0, -polar_de, 0), 6, "B2");
+                }
+                // draw ecliptic
+                {
+                    // North: right ascension 18h 0m 0.0s (exact), declination +66° 33′ 38.55″
+                    let eclipticRADE = new RADEtype(18, 0, 66, 34);
+                    let eclipticN = eclipticRADE.toV3D();
+                    let springRADE = new RADEtype(0, 0, 0, 0);
+                    let pos0 = springRADE.toV3D();
+                    let rot2deg = new M3Dtype();
+                    rot2deg.create_rot_n(eclipticN, 1 * Math.PI / 180);
+                    for (let i = 0; i < 360; i += 2) {
+                        let pos1 = rot2deg.mmul(pos0);
+                        let pos0RADE = pos0.toRADE();
+                        let pos1RADE = pos1.toRADE();
+                        console.log(pos0RADE.toString() + ' ' + pos0.toString() + ' => ' + pos1RADE.toString() + ' ' + pos1.toString());
+                        draw_line_on_screen(ctx, pos0RADE, pos1RADE, 6, "O2");
+                        pos0 = rot2deg.mmul(pos1);
+                    }
+                    draw_text_on_screen(ctx, new RADEtype(0, 0, 0, 0), 1, "G2", "Frühlingspunkt", 6);
+                    draw_text_on_screen(ctx, new RADEtype(12, 0, 0, 0), 1, "G2", "Herbstpunkt", 6);
+                    draw_line_on_screen(ctx, new RADEtype(6, 0, 1, 0), new RADEtype(6, 0, -1, 0), 6, "G2");
+                    draw_text_on_screen(ctx, new RADEtype(6, 0, 0, 0), 1, "G2", "Sommersonnenwende", 6);
+                    draw_line_on_screen(ctx, new RADEtype(18, 0, 1, 0), new RADEtype(18, 0, -1, 0), 6, "G2");
+                    draw_text_on_screen(ctx, new RADEtype(18, 0, 0, 0), 1, "G2", "Wintersonnenwende", 6);
                 }
                 // 0 and 12 meridian
                 for (let i = -90; i < 90; i += 2) {
