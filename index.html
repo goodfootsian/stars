@@ -345,18 +345,18 @@
         function getRGB(color, mag) {
             let rgb = 0;
             switch (color.charAt()) {
-                case 'O': rgb = new V3Dtype(200, 200, 255); break;
-                case 'B': rgb = new V3Dtype(220, 220, 255); break;
-                case 'A': rgb = new V3Dtype(230, 230, 255); break;
-                case 'F': rgb = new V3Dtype(255, 255, 200); break;
-                case 'G': rgb = new V3Dtype(250, 250, 100); break;
-                case 'K': rgb = new V3Dtype(255, 200, 100); break;
-                case 'M': rgb = new V3Dtype(255, 200, 200); break;
+                case 'O': rgb = new V3Dtype(100, 100, 255); break;
+                case 'B': rgb = new V3Dtype(150, 150, 255); break;
+                case 'A': rgb = new V3Dtype(220, 220, 255); break;
+                case 'F': rgb = new V3Dtype(255, 255, 220); break;
+                case 'G': rgb = new V3Dtype(255, 255, 100); break;
+                case 'K': rgb = new V3Dtype(255, 127, 100); break;
+                case 'M': rgb = new V3Dtype(255, 100, 64); break;
                 default: rgb = new V3Dtype(200, 200, 200); break;
             }
             if (mag > 4) rgb.mul(.7);
-            if (mag > 5) rgb.mul(.7);
-            if (mag > 6) rgb.mul(.7);
+            if (mag > 5) rgb.mul(.6);
+            if (mag > 6) rgb.mul(.6);
             let s = rgb.toRGB();
             return s;
         }
@@ -436,6 +436,16 @@
                     draw_line_on_screen(ctx, new RADEtype(0, 0, 88, 0), new RADEtype(12, 0, 88, 0), 6, "G2");
                     draw_line_on_screen(ctx, new RADEtype(6, 0, 88, 0), new RADEtype(18, 0, 88, 0), 6, "G2");
                     draw_text_on_screen(ctx, new RADEtype(0, 0, 90, 0), 1, "G2", "North Pole", 6);
+                    /*
+                    // color test
+                    draw_star_on_screen(ctx, new RADEtype(5, 0, 0, 0), -2, "O");
+                    draw_star_on_screen(ctx, new RADEtype(5, 200, 0, 0), -2, "B");
+                    draw_star_on_screen(ctx, new RADEtype(5, 400, 0, 0), -2, "A");
+                    draw_star_on_screen(ctx, new RADEtype(6, 0, 0, 0), -2, "F");
+                    draw_star_on_screen(ctx, new RADEtype(6, 200, 0, 0), -2, "G");
+                    draw_star_on_screen(ctx, new RADEtype(6, 400, 0, 0), -2, "K");
+                    draw_star_on_screen(ctx, new RADEtype(7, 0, 0, 0), -2, "M");
+                    */
                 }
                 // draw south pole
                 {
