@@ -419,7 +419,7 @@
                 p2.toV3D();
             }
             */
-            draw_line(ctx, mag, 'G2', cwidth / 2 + s1.x * magnification, cheight / 2 + s1.y * magnification, cwidth / 2 + s2.x * magnification, cheight / 2 + s2.y * magnification);
+            draw_line(ctx, mag, color, cwidth / 2 + s1.x * magnification, cheight / 2 + s1.y * magnification, cwidth / 2 + s2.x * magnification, cheight / 2 + s2.y * magnification);
         }
         function draw_star_on_screen(ctx, p1, mag, color) {
             let s1c = p1.toV3D();
@@ -477,8 +477,8 @@
                     const ecliptic_obliquity = 23.4; // degrees
                     const polar_de = 66.5; // degrees
                     draw_line_on_screen(ctx, new RADEtype(i / 15, 0, 0, 0), new RADEtype((i + 1) / 15, 0, 0, 0), 6, "G2");
-                    draw_line_on_screen(ctx, new RADEtype(i / 15, 0, ecliptic_obliquity, 0), new RADEtype((i + 1) / 15, 0, ecliptic_obliquity, 0), 6, "B2");
-                    draw_line_on_screen(ctx, new RADEtype(i / 15, 0, -ecliptic_obliquity, 0), new RADEtype((i + 1) / 15, 0, -ecliptic_obliquity, 0), 6, "B2");
+                    draw_line_on_screen(ctx, new RADEtype(i / 15, 0, ecliptic_obliquity, 0), new RADEtype((i + 1) / 15, 0, ecliptic_obliquity, 0), 6, "G2");
+                    draw_line_on_screen(ctx, new RADEtype(i / 15, 0, -ecliptic_obliquity, 0), new RADEtype((i + 1) / 15, 0, -ecliptic_obliquity, 0), 6, "G2");
                     draw_line_on_screen(ctx, new RADEtype(i / 15, 0, polar_de, 0), new RADEtype((i + 1) / 15, 0, polar_de, 0), 6, "B2");
                     draw_line_on_screen(ctx, new RADEtype(i / 15, 0, -polar_de, 0), new RADEtype((i + 1) / 15, 0, -polar_de, 0), 6, "B2");
                 }
@@ -496,7 +496,7 @@
                         let pos0RADE = pos0.toRADE();
                         let pos1RADE = pos1.toRADE();
                         //console.log(pos0RADE.toString() + ' ' + pos0.toString() + ' => ' + pos1RADE.toString() + ' ' + pos1.toString());
-                        draw_line_on_screen(ctx, pos0RADE, pos1RADE, 6, "O2");
+                        draw_line_on_screen(ctx, pos0RADE, pos1RADE, 6, "G2");
                         pos0 = rot2deg.mmul(pos1);
                     }
                     draw_text_on_screen(ctx, new RADEtype(0, 0, 0, 0), 1, "G2", "Frühlingspunkt", 6);
@@ -506,13 +506,12 @@
                     draw_line_on_screen(ctx, new RADEtype(18, 0, 1, 0), new RADEtype(18, 0, -1, 0), 6, "G2");
                     draw_text_on_screen(ctx, new RADEtype(18, 0, 0, 0), 1, "G2", "Wintersonnenwende", 6);
                 }
-                // 0 and 12 meridian
+                // draw 0 and 12 meridian
                 for (let i = -90; i < 90; i += 2) {
                     draw_line_on_screen(ctx, new RADEtype(0, 0, i, 0), new RADEtype(0, 0, i + 1, 0), 6, "G2");
                     draw_line_on_screen(ctx, new RADEtype(12, 0, i, 0), new RADEtype(12, 0, i + 1, 0), 6, "G2");
                 }
             }
-            // draw ecliptic
             // draw stars
             let cnt = 0;
             let hit = 0;
