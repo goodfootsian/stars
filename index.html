@@ -27,6 +27,18 @@
         document.addEventListener('keydown', function (event) {
             eventq = event.keyCode;
         });
+        //
+        var text2 = document.createElement('div');
+        text2.style.position = 'absolute';
+        text2.style.top = 10 + 'px';
+        text2.style.left = 10 + 'px';
+        text2.style.width = 100;
+        text2.style.height = 200;
+        text2.style.fontSize = "12px";
+        text2.style.color = "#303080";
+        text2.style.backgroundColor = "#00000000";
+        text2.innerHTML = ""
+        document.body.appendChild(text2);
 
         // touch events
         canvas.addEventListener("touchstart", handleStart);
@@ -514,10 +526,26 @@
                     draw_text_on_screen(ctx, starRADE, stars[i].Ptm, stars[i].SpT, stars[i].name, 6);
                 }
             }
+            // inscription
+            text2.innerHTML = "<h2>"
+                + "Position: " + ego.toString('View') + "<br>"
+                + 'Stars: ' + cnt.toString() + "<br>"
+                + "Keys:" + "<br>"
+                + "<-    yaw left" + "<br>"
+                + "->    yaw right" + "<br>"
+                + "up    pitch up" + "<br>"
+                + "down  pitch down" + "<br>"
+                + "L     roll left" + "<br>"
+                + "R     roll right" + "<br>"
+                + "N     switch star names on/off" + "<br>"
+                + "G     switch grid on/off" + "<br>"
+                ;
+            /*
             ctx.fillStyle = 'orange';
             ctx.fillText(ego.toString('View')
                 + ', stars=' + cnt.toString()
                 , 0, 50);
+                */
         }
 
         const st_insertcoin = 0;
