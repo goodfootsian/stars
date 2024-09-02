@@ -93,7 +93,7 @@
             toXY() {
                 return new V3Dtype();
             }
-            screen_coordinates2(p0x, p0y, n) {
+            to_screen_coordinates2(p0x, p0y, n) {
                 let s2 = this.na.screen_coordinates(p0x, p0y, n);
                 return new V3Dtype(this.cwidth / 2 + s2.x * this.magnification, this.cheight / 2 + s2.y * this.magnification, 0);
             }
@@ -433,21 +433,21 @@
         function draw_line_on_screen(ctx, p1, p2, mag, color) {
             let s1c = p1.toV3D();
             let s2c = p2.toV3D();
-            let s1 = screen.screen_coordinates2(p0x, p0y, s1c);
+            let s1 = screen.to_screen_coordinates2(p0x, p0y, s1c);
             if (screen.na.error) return;
-            let s2 = screen.screen_coordinates2(p0x, p0y, s2c);
+            let s2 = screen.to_screen_coordinates2(p0x, p0y, s2c);
             if (screen.na.error) return;
             draw_line(ctx, mag, color, s1.x, s1.y, s2.x, s2.y);
         }
         function draw_star_on_screen(ctx, p1, mag, color) {
             let s1c = p1.toV3D();
-            let s1 = screen.screen_coordinates2(p0x, p0y, s1c);
+            let s1 = screen.to_screen_coordinates2(p0x, p0y, s1c);
             if (screen.na.error) return;
             draw_star(ctx, mag, color, s1.x, s1.y);
         }
         function draw_text_on_screen(ctx, p1, mag, color, text, magStar) {
             let s1c = p1.toV3D();
-            let s1 = screen.screen_coordinates2(p0x, p0y, s1c);
+            let s1 = screen.to_screen_coordinates2(p0x, p0y, s1c);
             if (screen.na.error) return;
             let sz = get_star_radius(mag);
             ctx.fillStyle = getRGB(color, magStar);
