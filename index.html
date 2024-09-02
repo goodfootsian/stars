@@ -51,6 +51,13 @@
         function handleCancel() { }
         function handleMove() { }
 
+        // mouse events
+        canvas.addEventListener("click", mouseClick);
+
+        function mouseClick(evt) {
+            console.log('click ' + evt.pageX.toFixed(0) + ', ' + evt.pageY.toFixed(0));
+        }
+
         var Tschioo = new Audio('Tschioo.mp3');
         var Prrt = new Audio('Prrt.mp3');
         var Bouff = new Audio('Bouff.mp3');
@@ -73,6 +80,20 @@
                 this.m = m;
             }
         }
+        class SCREENtype {
+            constructor(na, cwidth, cheight) {
+                this.na = na;
+                this.cwidth = cwidth;
+                this.cheight = cheight;
+            }
+            toV3D(x, y) {
+                return new V3Dtype();
+            }
+            toXY() {
+                return new V3Dtype();
+            }
+        }
+
         class RADEtype {
             constructor(h = 0, dm = 0, d = 0, m = 0) {
                 this.h = h;  // increases when moving left
