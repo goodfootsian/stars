@@ -93,6 +93,10 @@
             toXY() {
                 return new V3Dtype();
             }
+            screen_coordinates2(p0x, p0y, n) {
+                let s2 = this.na.screen_coordinates(p0x, p0y, n);
+                return new V3Dtype(this.cwidth / 2 + s2.x * this.magnification, this.cheight / 2 + s2.y * this.magnification, 0);
+            }
         }
 
         class RADEtype {
@@ -266,19 +270,6 @@
                 }
                 return new V3Dtype(s2x, s2y, 0);
             }
-            screen_coordinates2(p0x, p0y, n) {
-                let s2 = this.intersection_point(new NAtype(n, new V3Dtype(0, 0, 0)));
-                let s2x = -p0x.distance(s2);
-                let s2y = p0y.distance(s2);
-                this.error = false;
-                if (this.l < 0) {
-                    this.error = true;
-                }
-                if (Math.abs(this.l) > 10000) {
-                    this.error = true;
-                }
-                return new V3Dtype(this.cwidth / 2 + s2x * this.magnification, this.cheight / 2 + s2y * this.magnification, 0);
-            }
         }
         class M3Dtype
         {
@@ -442,37 +433,28 @@
         function draw_line_on_screen(ctx, p1, p2, mag, color) {
             let s1c = p1.toV3D();
             let s2c = p2.toV3D();
-            let s1 = screen.na.screen_coordinates(p0x, p0y, s1c);
+            let s1 = screen.screen_coordinates2(p0x, p0y, s1c);
             if (screen.na.error) return;
-            let s2 = screen.na.screen_coordinates(p0x, p0y, s2c);
+            let s2 = screen.screen_coordinates2(p0x, p0y, s2c);
             if (screen.na.error) return;
-            stest = s1.clone();
-            stest.subtract(s2);
-            /*
-            if (stest.abs() > 1000) {
-                console.log(stest.toString("overflow"))
-                p2.toV3D();
-            }
-            */
-            draw_line(ctx, mag, color, cwidth / 2 + s1.x * screen.magnification, cheight / 2 + s1.y * screen.magnification, cwidth / 2 + s2.x * screen.magnification, cheight / 2 + s2.y * screen.magnification);
+            draw_line(ctx, mag, color, s1.x, s1.y, s2.x, s2.y);
         }
         function draw_star_on_screen(ctx, p1, mag, color) {
             let s1c = p1.toV3D();
-            let s1 = screen.na.screen_coordinates(p0x, p0y, s1c);
+            let s1 = screen.screen_coordinates2(p0x, p0y, s1c);
             if (screen.na.error) return;
-            draw_star(ctx, mag, color, cwidth / 2 + s1.x * screen.magnification, cheight / 2 + s1.y * screen.magnification);
+            draw_star(ctx, mag, color, s1.x, s1.y);
         }
         function draw_text_on_screen(ctx, p1, mag, color, text, magStar) {
             let s1c = p1.toV3D();
-            let s1 = screen.na.screen_coordinates(p0x, p0y, s1c);
+            let s1 = screen.screen_coordinates2(p0x, p0y, s1c);
             if (screen.na.error) return;
-            //draw_star(ctx, mag, color, cwidth / 2 + s1.x * screen.magnification, cheight / 2 + s1.y * screen.magnification);
             let sz = get_star_radius(mag);
             ctx.fillStyle = getRGB(color, magStar);
             ctx.font = '12px georgia';
             ctx.textAlign = "left";
             ctx.textBaseline = 'top'
-            ctx.fillText(text, cwidth / 2 + s1.x * screen.magnification + sz, cheight / 2 + s1.y * screen.magnification + sz);
+            ctx.fillText(text, s1.x + sz, s1.y + sz);
         }
         function draw_field(ctx) {
             // fill with background color
@@ -554,11 +536,6 @@
                 //if (stars[i].h > 12) continue;
                 let starRADE = new RADEtype(stars[i].h, stars[i].dm, stars[i].d, stars[i].m);
                 let starpoint = starRADE.toV3D();
-                /*
-                let l = 0;
-                let s3 = screen.na.screen_coordinates(p0x, p0y, starpoint);
-                if (screen.na.error) continue;
-                */
                 draw_star_on_screen(ctx, starRADE, stars[i].Ptm, stars[i].SpT);
                 if (show_names && stars[i].name.length && stars[i].Ptm < 2.5) {
                     draw_text_on_screen(ctx, starRADE, stars[i].Ptm, stars[i].SpT, stars[i].name, 6);
