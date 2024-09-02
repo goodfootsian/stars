@@ -81,10 +81,11 @@
             }
         }
         class SCREENtype {
-            constructor(na, cwidth, cheight) {
+            constructor(na, cwidth, cheight, magnification) {
                 this.na = na;
                 this.cwidth = cwidth;
                 this.cheight = cheight;
+                this.magnification = magnification;
             }
             toV3D(x, y) {
                 return new V3Dtype();
@@ -265,6 +266,19 @@
                 }
                 return new V3Dtype(s2x, s2y, 0);
             }
+            screen_coordinates2(p0x, p0y, n) {
+                let s2 = this.intersection_point(new NAtype(n, new V3Dtype(0, 0, 0)));
+                let s2x = -p0x.distance(s2);
+                let s2y = p0y.distance(s2);
+                this.error = false;
+                if (this.l < 0) {
+                    this.error = true;
+                }
+                if (Math.abs(this.l) > 10000) {
+                    this.error = true;
+                }
+                return new V3Dtype(this.cwidth / 2 + s2x * this.magnification, this.cheight / 2 + s2y * this.magnification, 0);
+            }
         }
         class M3Dtype
         {
@@ -344,7 +358,7 @@
         var egoP = new RADEtype(0, 0, 90, 0);
         var e = ego.toV3D();
         var eP = egoP.toV3D();
-        var magnification = 600;
+        //var magnification = 600;
         var show_grid = true;
         var show_names = true;
         var rot_deg = 5;
@@ -424,7 +438,7 @@
         }
         var p0x = 0;
         var p0y = 0;
-        var screen = 0;
+        var screen = new SCREENtype(new NAtype(e, e), cwidth, cheight, 600);
         function draw_line_on_screen(ctx, p1, p2, mag, color) {
             let s1c = p1.toV3D();
             let s2c = p2.toV3D();
@@ -440,25 +454,25 @@
                 p2.toV3D();
             }
             */
-            draw_line(ctx, mag, color, cwidth / 2 + s1.x * magnification, cheight / 2 + s1.y * magnification, cwidth / 2 + s2.x * magnification, cheight / 2 + s2.y * magnification);
+            draw_line(ctx, mag, color, cwidth / 2 + s1.x * screen.magnification, cheight / 2 + s1.y * screen.magnification, cwidth / 2 + s2.x * screen.magnification, cheight / 2 + s2.y * screen.magnification);
         }
         function draw_star_on_screen(ctx, p1, mag, color) {
             let s1c = p1.toV3D();
             let s1 = screen.na.screen_coordinates(p0x, p0y, s1c);
             if (screen.na.error) return;
-            draw_star(ctx, mag, color, cwidth / 2 + s1.x * magnification, cheight / 2 + s1.y * magnification);
+            draw_star(ctx, mag, color, cwidth / 2 + s1.x * screen.magnification, cheight / 2 + s1.y * screen.magnification);
         }
         function draw_text_on_screen(ctx, p1, mag, color, text, magStar) {
             let s1c = p1.toV3D();
             let s1 = screen.na.screen_coordinates(p0x, p0y, s1c);
             if (screen.na.error) return;
-            //draw_star(ctx, mag, color, cwidth / 2 + s1.x * magnification, cheight / 2 + s1.y * magnification);
+            //draw_star(ctx, mag, color, cwidth / 2 + s1.x * screen.magnification, cheight / 2 + s1.y * screen.magnification);
             let sz = get_star_radius(mag);
             ctx.fillStyle = getRGB(color, magStar);
             ctx.font = '12px georgia';
             ctx.textAlign = "left";
             ctx.textBaseline = 'top'
-            ctx.fillText(text, cwidth / 2 + s1.x * magnification + sz, cheight / 2 + s1.y * magnification + sz);
+            ctx.fillText(text, cwidth / 2 + s1.x * screen.magnification + sz, cheight / 2 + s1.y * screen.magnification + sz);
         }
         function draw_field(ctx) {
             // fill with background color
@@ -469,7 +483,7 @@
             ctx.font = '24px georgia';
             p0x = new NAtype(e.xproduct(eP), e);
             p0y = new NAtype(eP, new V3Dtype(0, 0, 0));
-            screen = new SCREENtype(new NAtype(e, e), cwidth, cheight);
+            screen.na = new NAtype(e, e);
             if (show_grid) {
                 // draw north pole
                 {
@@ -703,12 +717,12 @@
                     case 107: //num +
                     case 187: //keyboard+
                         // plus
-                        magnification *= 1.2;
+                        screen.magnification *= 1.2;
                         break;
                     case 109: //num-
                     case 189: //keyboard-
                         //minus
-                        magnification /= 1.2;
+                        screen.magnification /= 1.2;
                         break;
                 }
                 eventq = 0;
