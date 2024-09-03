@@ -92,8 +92,15 @@
                 this.p0y = 0;
             }
             to_screen_coordinates2(n) {
-                let s2 = this.na.screen_coordinates(this.p0x, this.p0y, n);
+                let s2 = this.na.to2D(this.p0x, this.p0y, n);
+                return this.twoDtoScreen(s2);
+                //return new V3Dtype(this.cwidth / 2 + s2.x * this.magnification, this.cheight / 2 + s2.y * this.magnification, 0);
+            }
+            twoDtoScreen(s2) {
                 return new V3Dtype(this.cwidth / 2 + s2.x * this.magnification, this.cheight / 2 + s2.y * this.magnification, 0);
+            }
+            Screento2D(s) {
+                return new V3Dtype((s.x - this.cwidth / 2) / this.magnification, (s.y - this.cheight / 2) / this.magnification, 0);
             }
             toV3D(x, y) {
                 let tmp = new V3Dtype((x - this.cwidth / 2) / this.magnification, (y - this.cheight / 2) / this.magnification, 0);
@@ -268,7 +275,7 @@
                 this.l = this.n.sproduct(a) / cos_g;
                 return line.x(this.l);
             }
-            screen_coordinates(p0x, p0y, n) {
+            to2D(p0x, p0y, n) {
                 let s2 = this.intersection_point(new NAtype(n, new V3Dtype(0, 0, 0)));
                 let s2x = -p0x.distance(s2);
                 let s2y = p0y.distance(s2);
@@ -362,7 +369,28 @@
         var egoP = new RADEtype(0, 0, 90, 0);
         var e = ego.toV3D();
         var eP = egoP.toV3D();
-        //var magnification = 600;
+
+        // the screen
+        var screen = new SCREENtype(cwidth, cheight, 600);
+        screen.p0x = new NAtype(e.xproduct(eP), e);
+        screen.p0y = new NAtype(eP, new V3Dtype(0, 0, 0));
+        screen.na = new NAtype(e, e);
+        {
+            // test SCREENtype
+            console.log("test SCREENtype");
+            let starpos = new RADEtype(6, 0, -16, 0);
+            let starpos_cart = starpos.toV3D();
+            console.log(starpos_cart.toRADE().toString("6, -16?"));
+            let s = screen.to_screen_coordinates2(starpos_cart);
+            let s2d = screen.na.to2D(screen.p0x, screen.p0y, starpos_cart);
+            let ss = screen.twoDtoScreen(s2d);
+            let s2d2 = screen.Screento2D(ss);
+            console.log(s2d.toString("s2d") + s2d2.toString("s2d2"));
+            let t = screen.toV3D(s.x, s.y);
+            let u = t.toRADE();
+            console.log(starpos_cart.toString() + t.toString());
+            console.log(starpos.toString() + u.toString());
+        }
         var show_grid = true;
         var show_names = true;
         var rot_deg = 5;
@@ -440,7 +468,6 @@
             // Draw the Path
             ctx.stroke();
         }
-        var screen = new SCREENtype(cwidth, cheight, 600);
         function draw_line_on_screen(ctx, p1, p2, mag, color) {
             let s1c = p1.toV3D();
             let s2c = p2.toV3D();
