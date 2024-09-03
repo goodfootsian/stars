@@ -56,6 +56,8 @@
 
         function mouseClick(evt) {
             console.log('click ' + evt.pageX.toFixed(0) + ', ' + evt.pageY.toFixed(0));
+            let n = screen.to_cartesian(evt.pageX, evt.pageY);
+            console.log(n.toString("n"));
         }
 
         var Tschioo = new Audio('Tschioo.mp3');
@@ -81,11 +83,13 @@
             }
         }
         class SCREENtype {
-            constructor(na, cwidth, cheight, magnification) {
-                this.na = na;
+            constructor(cwidth, cheight, magnification) {
                 this.cwidth = cwidth;
                 this.cheight = cheight;
                 this.magnification = magnification;
+                this.na = 0;
+                this.p0x = 0;
+                this.p0y = 0;
             }
             toV3D(x, y) {
                 return new V3Dtype();
@@ -93,9 +97,12 @@
             toXY() {
                 return new V3Dtype();
             }
-            to_screen_coordinates2(p0x, p0y, n) {
-                let s2 = this.na.screen_coordinates(p0x, p0y, n);
+            to_screen_coordinates2(n) {
+                let s2 = this.na.screen_coordinates(this.p0x, this.p0y, n);
                 return new V3Dtype(this.cwidth / 2 + s2.x * this.magnification, this.cheight / 2 + s2.y * this.magnification, 0);
+            }
+            to_cartesian(x, y) {
+                return new V3Dtype((x - this.cwidth / 2) / this.magnification, (y - this.cheight / 2) / this.magnification, 0);
             }
         }
 
@@ -263,9 +270,11 @@
                 let s2y = p0y.distance(s2);
                 this.error = false;
                 if (this.l < 0) {
+                    // the object is in our back
                     this.error = true;
                 }
                 if (Math.abs(this.l) > 10000) {
+                    // the object is too far off the center of the screen
                     this.error = true;
                 }
                 return new V3Dtype(s2x, s2y, 0);
@@ -427,27 +436,25 @@
             // Draw the Path
             ctx.stroke();
         }
-        var p0x = 0;
-        var p0y = 0;
-        var screen = new SCREENtype(new NAtype(e, e), cwidth, cheight, 600);
+        var screen = new SCREENtype(cwidth, cheight, 600);
         function draw_line_on_screen(ctx, p1, p2, mag, color) {
             let s1c = p1.toV3D();
             let s2c = p2.toV3D();
-            let s1 = screen.to_screen_coordinates2(p0x, p0y, s1c);
+            let s1 = screen.to_screen_coordinates2(s1c);
             if (screen.na.error) return;
-            let s2 = screen.to_screen_coordinates2(p0x, p0y, s2c);
+            let s2 = screen.to_screen_coordinates2(s2c);
             if (screen.na.error) return;
             draw_line(ctx, mag, color, s1.x, s1.y, s2.x, s2.y);
         }
         function draw_star_on_screen(ctx, p1, mag, color) {
             let s1c = p1.toV3D();
-            let s1 = screen.to_screen_coordinates2(p0x, p0y, s1c);
+            let s1 = screen.to_screen_coordinates2(s1c);
             if (screen.na.error) return;
             draw_star(ctx, mag, color, s1.x, s1.y);
         }
         function draw_text_on_screen(ctx, p1, mag, color, text, magStar) {
             let s1c = p1.toV3D();
-            let s1 = screen.to_screen_coordinates2(p0x, p0y, s1c);
+            let s1 = screen.to_screen_coordinates2(s1c);
             if (screen.na.error) return;
             let sz = get_star_radius(mag);
             ctx.fillStyle = getRGB(color, magStar);
@@ -463,8 +470,8 @@
             // text
             ctx.fillStyle = 'blue';
             ctx.font = '24px georgia';
-            p0x = new NAtype(e.xproduct(eP), e);
-            p0y = new NAtype(eP, new V3Dtype(0, 0, 0));
+            screen.p0x = new NAtype(e.xproduct(eP), e);
+            screen.p0y = new NAtype(eP, new V3Dtype(0, 0, 0));
             screen.na = new NAtype(e, e);
             if (show_grid) {
                 // draw north pole
