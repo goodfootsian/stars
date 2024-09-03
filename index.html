@@ -56,8 +56,8 @@
 
         function mouseClick(evt) {
             console.log('click ' + evt.pageX.toFixed(0) + ', ' + evt.pageY.toFixed(0));
-            let n = screen.to_cartesian(evt.pageX, evt.pageY);
-            console.log(n.toString("n"));
+            let n = screen.toV3D(evt.pageX, evt.pageY);
+            console.log(n.toString("n") + n.toRADE().toString());
         }
 
         var Tschioo = new Audio('Tschioo.mp3');
@@ -91,18 +91,18 @@
                 this.p0x = 0;
                 this.p0y = 0;
             }
-            toV3D(x, y) {
-                return new V3Dtype();
-            }
-            toXY() {
-                return new V3Dtype();
-            }
             to_screen_coordinates2(n) {
                 let s2 = this.na.screen_coordinates(this.p0x, this.p0y, n);
                 return new V3Dtype(this.cwidth / 2 + s2.x * this.magnification, this.cheight / 2 + s2.y * this.magnification, 0);
             }
-            to_cartesian(x, y) {
-                return new V3Dtype((x - this.cwidth / 2) / this.magnification, (y - this.cheight / 2) / this.magnification, 0);
+            toV3D(x, y) {
+                let tmp = new V3Dtype((x - this.cwidth / 2) / this.magnification, (y - this.cheight / 2) / this.magnification, 0);
+                let v = this.na.n.clone();
+                let p0xn = this.p0x.n.clone();
+                let p0yn = this.p0y.n.clone();
+                v.add(p0xn.mul(tmp.x));
+                v.add(p0yn.mul(-tmp.y));
+                return v;
             }
         }
 
@@ -183,6 +183,7 @@
                 this.x *= f;
                 this.y *= f;
                 this.z *= f;
+                return this;
             }
             copy(a) {
                 this.x = a.x;
@@ -206,6 +207,9 @@
                 this.x -= a.x;
                 this.y -= a.y;
                 this.z -= a.z;
+            }
+            distance(a) {
+                return new V3Dtype(this.x - a.x, this.y - a.y, this.z - a.z).abs();
             }
             add(a) {
                 this.x += a.x;
@@ -455,6 +459,12 @@
         function draw_text_on_screen(ctx, p1, mag, color, text, magStar) {
             let s1c = p1.toV3D();
             let s1 = screen.to_screen_coordinates2(s1c);
+            /*
+            DEBUG please!
+            distance() should be zero!!
+            let s1c2 = screen.toV3D(s1.x, s1.y);
+            console.log(s1c.toString() + s1c2.toString() + ', distance=' + s1c.distance(s1c2));
+            */
             if (screen.na.error) return;
             let sz = get_star_radius(mag);
             ctx.fillStyle = getRGB(color, magStar);
