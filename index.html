@@ -62,6 +62,20 @@
         canvas.addEventListener("mousedown", mouseDown);
         canvas.addEventListener("mousemove", mouseMove);
         canvas.addEventListener("mouseup", mouseUp);
+        canvas.addEventListener("wheel", mouseWheel);
+
+        function mouseWheel(evt) {
+            console.log("wheel" + " deltaX=" + evt.deltaX.toFixed(0) + " deltaY=" + evt.deltaY.toFixed(0) + ", " + evt.pageX.toFixed(0) + ", " + evt.pageY.toFixed(0));
+            let twoD = screen.Screento2D(new V3Dtype(evt.pageX, evt.pageY, 0));
+            //console.log(twoD.toString("2D"));
+            let n = screen.twoDtoV3D(twoD.x, twoD.y);
+            //console.log(n.toString("n") + n.toRADE().toString());
+            if (evt.deltaY > 0) {
+                screen.magnification /= 1.2;
+            } else if (evt.deltaY < 0) {
+                screen.magnification *= 1.2;
+            } 
+        }
 
         function mouseClick(evt) {
             //console.log('click ' + evt.pageX.toFixed(0) + ', ' + evt.pageY.toFixed(0));
