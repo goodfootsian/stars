@@ -18,7 +18,34 @@
     <script src="star_class.js"></script>
     <script src="hip_db.js"></script>
     <script>
+        class Ctype {
+            constructor(constellation = "unknown", HD0 = "", HD1 = "") {
+                this.constellation = constellation;
+                this.HD0 = HD0;
+                this.HD1 = HD1;
+            }
+        }
+        var constellation = []
+        constellation.push(new Ctype('Gemini', '37826', '36850'));
+        constellation.push(new Ctype('Gemini', '37826', '35550'));
+        constellation.push(new Ctype('Gemini', '35550', '31681'));
+        constellation.push(new Ctype('Gemini', '36850', '32246'));
+        constellation.push(new Ctype('Gemini', '32246', '30343'));
+        constellation.push(new Ctype('Canis Major', '32349', '30324'));
+        constellation.push(new Ctype('Canis Major', '32349', '34444'));
+        constellation.push(new Ctype('Canis Major', '34444', '33579'));
+        constellation.push(new Ctype('Canis Major', '34444', '35904'));
+        constellation.push(new Ctype('Canis Major', '32349', '34045'));
+        constellation.push(new Ctype('Canis Major', '34045', '33160'));
+        constellation.push(new Ctype('Canis Major', 'xx', 'xx'));
+        constellation.push(new Ctype('Canis Major', 'xx', 'xx'));
+        constellation.push(new Ctype('Canis Major', 'xx', 'xx'));
+        constellation.push(new Ctype('Canis Major', 'xx', 'xx'));
+        constellation.push(new Ctype('Canis Major', 'xx', 'xx'));
+        constellation.push(new Ctype('Gemini', 'xx', 'xx'));
+        constellation.push(new Ctype('Gemini', 'xx', 'xx'));
 
+        31681
         const canvas = document.querySelector('.myCanvas');
         const cwidth = canvas.width = window.innerWidth;
         const cheight = canvas.height = window.innerHeight;
@@ -541,6 +568,7 @@
             }
             console.log("test SCREENtype END -----------------");
         }
+        var show_constellations = true;
         var show_grid = true;
         var show_names = true;
         var rot_deg = 5;
@@ -674,6 +702,15 @@
             }
             return str;
         }
+        function lookup_star(HD) {
+            for (let i = 0; i < stars.length; ++i) {
+                if (stars[i].HD == HD) {
+                    return new RADEtype(stars[i].h, stars[i].dm, stars[i].d, stars[i].m);
+                }
+            }
+            return new RADEtype(0, 0, 0, 0);
+
+        }
         function draw_field(ctx) {
             // fill with background color
             ctx.fillStyle = 'rgb(5, 5, 25)';
@@ -684,6 +721,14 @@
             screen.p0x = new NAtype(e.xproduct_n(eP), e);
             screen.p0y = new NAtype(eP, new V3Dtype(0, 0, 0));
             screen.na = new NAtype(e, e);
+            if (show_constellations) {
+                // draw constellations
+                for (let i = 0; i < constellation.length; ++i) {
+                    let s0 = lookup_star(constellation[i].HD0);
+                    let s1 = lookup_star(constellation[i].HD1);
+                    draw_line_on_screen(ctx, s0, s1, 6, "G2");
+                }
+            }
             if (show_grid) {
                 // draw north pole
                 {
@@ -877,6 +922,9 @@
                             eP = m.mmul(eP);
                             ego = e.toRADE();
                         }
+                        break;
+                    case 67: // 'C':
+                        show_constellations = !show_constellations;
                         break;
                     case 71: // 'G':
                         show_grid = !show_grid;
