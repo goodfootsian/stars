@@ -23,10 +23,6 @@
         const cwidth = canvas.width = window.innerWidth;
         const cheight = canvas.height = window.innerHeight;
 
-        var eventq = 0;
-        document.addEventListener('keydown', function (event) {
-            eventq = event.keyCode;
-        });
         //
         var text2 = document.createElement('div');
         text2.style.position = 'absolute';
@@ -40,6 +36,11 @@
         text2.innerHTML = ""
         document.body.appendChild(text2);
 
+        // event listeners
+        var eventq = 0;
+        document.addEventListener('keydown', function (event) {
+            eventq = event.keyCode;
+        });
         // touch events
         canvas.addEventListener("touchstart", handleStart);
         canvas.addEventListener("touchend", handleEnd);
@@ -52,14 +53,64 @@
         function handleMove() { }
 
         // mouse events
+        const mst_free = 0;
+        const mst_down = 1;
+        var mst = mst_free;
+        var mstart_x = 0;
+        var mstart_y = 0;
         canvas.addEventListener("click", mouseClick);
+        canvas.addEventListener("mousedown", mouseDown);
+        canvas.addEventListener("mousemove", mouseMove);
+        canvas.addEventListener("mouseup", mouseUp);
 
         function mouseClick(evt) {
-            console.log('click ' + evt.pageX.toFixed(0) + ', ' + evt.pageY.toFixed(0));
+            //console.log('click ' + evt.pageX.toFixed(0) + ', ' + evt.pageY.toFixed(0));
             let twoD = screen.Screento2D(new V3Dtype(evt.pageX, evt.pageY, 0));
             console.log(twoD.toString("2D"));
             let n = screen.twoDtoV3D(twoD.x, twoD.y);
             console.log(n.toString("n") + n.toRADE().toString());
+        }
+
+        function mouseDown(evt) {
+            mst = mst_down;
+            mstart_x = evt.pageX;
+            mstart_y = evt.pageY;
+            console.log('mousedown ' + evt.pageX.toFixed(0) + ', ' + evt.pageY.toFixed(0));
+        }
+
+        function mouseUp(evt) {
+            switch (mst) {
+                case mst_down:
+                    mst = mst_free;
+                    console.log('mousestart ' + mstart_x.toFixed(0) + ', ' + mstart_y.toFixed(0));
+                    console.log('mouseup ' + evt.pageX.toFixed(0) + ', ' + evt.pageY.toFixed(0));
+                    {
+                        let n0 = screen.ScreentoV3D(new V3Dtype(mstart_x, mstart_y, 0));
+                        let n1 = screen.ScreentoV3D(new V3Dtype(evt.pageX, evt.pageY, 0));
+                        let np = n0.xproduct_n(n1);  // rotation axis
+                        let angle = n0.angle(n1);
+                        console.log("angle = " + (angle / Math.PI * 180).toFixed(2))
+                        console.log(n0.toString("n0"));
+                        console.log(n1.toString("n1"));
+                        console.log(np.toString("np"));
+                        let m = new M3Dtype();
+                        m.create_rot_n(np, -angle);
+                        e = m.mmul(e);
+                        eP = m.mmul(eP);
+                        ego = e.toRADE();
+                    }
+                    break;
+            }
+        }
+
+        function mouseMove(evt) {
+            switch (mst) {
+                case mst_down:
+                    //console.log('mousemove ' + evt.pageX.toFixed(0) + ', ' + evt.pageY.toFixed(0));
+                    break;
+                default:
+                    break;
+            }
         }
 
         var Tschioo = new Audio('Tschioo.mp3');
@@ -93,7 +144,7 @@
                 this.p0x = 0;
                 this.p0y = 0;
             }
-            to_screen_coordinates(n) {
+            V3DtoScreen(n) {
                 let s2 = this.na.to2D(this.p0x, this.p0y, n);
                 return this.twoDtoScreen(s2);
                 //return new V3Dtype(this.cwidth / 2 + s2.x * this.magnification, this.cheight / 2 + s2.y * this.magnification, 0);
@@ -103,6 +154,10 @@
             }
             Screento2D(s) {
                 return new V3Dtype((s.x - this.cwidth / 2) / this.magnification, (s.y - this.cheight / 2) / this.magnification, 0);
+            }
+            ScreentoV3D(s) {
+                let t = this.Screento2D(s);
+                return this.twoDtoV3D(t.x, t.y);
             }
             twoDtoV3D(x, y) {
                 let v = this.na.n.clone();
@@ -212,9 +267,9 @@
             clone(a) {
                 return new V3Dtype(this.x, this.y, this.z);
             }
-            xproduct(b) {
+            xproduct_n(b) {
                 let result = new V3Dtype(this.y * b.z - this.z * b.y, this.z * b.x - this.x * b.z, this.x * b.y - this.y * b.x);
-                return result;
+                return result.normalize();
             }
             normalize() {
                 let a = this.abs(this);
@@ -395,7 +450,7 @@
 
         // the screen
         var screen = new SCREENtype(cwidth, cheight, 600);
-        screen.p0x = new NAtype(e.xproduct(eP), e);
+        screen.p0x = new NAtype(e.xproduct_n(eP), e);
         screen.p0y = new NAtype(eP, e);
         screen.na = new NAtype(e, e);
         {
@@ -425,7 +480,7 @@
             }
             {
                 console.log("test SCREENtype part 2 -----------------");
-                let s = screen.to_screen_coordinates(starpos.toV3D());
+                let s = screen.V3DtoScreen(starpos.toV3D());
                 console.log(s.toString("Screen"));
                 let twoD = screen.Screento2D(s);
                 let t = screen.twoDtoV3D(twoD.x, twoD.y);
@@ -515,21 +570,21 @@
         function draw_line_on_screen(ctx, p1, p2, mag, color) {
             let s1c = p1.toV3D();
             let s2c = p2.toV3D();
-            let s1 = screen.to_screen_coordinates(s1c);
+            let s1 = screen.V3DtoScreen(s1c);
             if (screen.na.error) return;
-            let s2 = screen.to_screen_coordinates(s2c);
+            let s2 = screen.V3DtoScreen(s2c);
             if (screen.na.error) return;
             draw_line(ctx, mag, color, s1.x, s1.y, s2.x, s2.y);
         }
         function draw_star_on_screen(ctx, p1, mag, color) {
             let s1c = p1.toV3D();
-            let s1 = screen.to_screen_coordinates(s1c);
+            let s1 = screen.V3DtoScreen(s1c);
             if (screen.na.error) return;
             draw_star(ctx, mag, color, s1.x, s1.y);
         }
         function draw_text_on_screen(ctx, p1, mag, color, text, magStar) {
             let s1c = p1.toV3D();
-            let s1 = screen.to_screen_coordinates(s1c);
+            let s1 = screen.V3DtoScreen(s1c);
             /*
             DEBUG please!
             distance() should be zero!!
@@ -551,7 +606,7 @@
             // text
             ctx.fillStyle = 'blue';
             ctx.font = '24px georgia';
-            screen.p0x = new NAtype(e.xproduct(eP), e);
+            screen.p0x = new NAtype(e.xproduct_n(eP), e);
             screen.p0y = new NAtype(eP, new V3Dtype(0, 0, 0));
             screen.na = new NAtype(e, e);
             if (show_grid) {
@@ -727,7 +782,7 @@
                     case 38:
                         //pitch up
                         {
-                            let a = e.xproduct(eP)
+                            let a = e.xproduct_n(eP)
                             // a is the pitch axis
                             let m = new M3Dtype();
                             m.create_rot_n(a, rot_deg * Math.PI / 180);
@@ -739,7 +794,7 @@
                     case 40:
                         //pitch down
                         {
-                            let a = e.xproduct(eP)
+                            let a = e.xproduct_n(eP)
                             // a is the pitch axis
                             let m = new M3Dtype();
                             m.create_rot_n(a, -rot_deg * Math.PI / 180);
