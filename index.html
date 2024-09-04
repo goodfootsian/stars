@@ -37,7 +37,35 @@
         constellation.push(new Ctype('Canis Major', '34444', '35904'));
         constellation.push(new Ctype('Canis Major', '32349', '34045'));
         constellation.push(new Ctype('Canis Major', '34045', '33160'));
-        constellation.push(new Ctype('Gemini', 'xx', 'xx'));
+        constellation.push(new Ctype('Orion', 'xx', 'xx'));
+        //constellation.push(new Ctype('Orion', '27989', '25336'));
+        constellation.push(new Ctype('Orion', '26727', '26311'));
+        constellation.push(new Ctype('Orion', '26311', '25930'));
+        constellation.push(new Ctype('Orion', '27366', '26727'));
+        constellation.push(new Ctype('Orion', '24436', '25930'));
+        constellation.push(new Ctype('Orion', '23123', '22797'));
+        constellation.push(new Ctype('Orion', '22797', '22549'));
+        constellation.push(new Ctype('Orion', '22549', '22449'));
+        constellation.push(new Ctype('Orion', '22449', '22509'));
+        constellation.push(new Ctype('Orion', '22509', '22845'));
+        constellation.push(new Ctype('Orion', '25930', '25930'));
+        constellation.push(new Ctype('Orion', '25930', '25336'));
+        constellation.push(new Ctype('Orion', '26727', '27989'));
+        constellation.push(new Ctype('Orion', '25336', '22449'));
+        constellation.push(new Ctype('Orion', '27989', '29038'));
+        constellation.push(new Ctype('Orion', '29038', '28716'));
+        constellation.push(new Ctype('Orion', '27989', '26207'));
+        constellation.push(new Ctype('Orion', '26207', '25336'));
+        constellation.push(new Ctype('Orion', '26237', '26237'));
+        constellation.push(new Ctype('Orion', '26237', '26221'));
+        constellation.push(new Ctype('Orion', '26221', '26241'));
+        constellation.push(new Ctype('Lyra', '91262', '91919'));
+        constellation.push(new Ctype('Lyra', '91919', '91971'));
+        constellation.push(new Ctype('Lyra', '91971', '91262'));
+        constellation.push(new Ctype('Lyra', '91971', '92791'));
+        constellation.push(new Ctype('Lyra', '92791', '93194'));
+        constellation.push(new Ctype('Lyra', '93194', '92420'));
+        constellation.push(new Ctype('Lyra', '92420', '91971'));
 
         const canvas = document.querySelector('.myCanvas');
         const cwidth = canvas.width = window.innerWidth;
@@ -85,7 +113,7 @@
         canvas.addEventListener("wheel", mouseWheel);
 
         function mouseWheel(evt) {
-            console.log("wheel" + " deltaX=" + evt.deltaX.toFixed(0) + " deltaY=" + evt.deltaY.toFixed(0) + ", " + evt.pageX.toFixed(0) + ", " + evt.pageY.toFixed(0));
+            //console.log("wheel" + " deltaX=" + evt.deltaX.toFixed(0) + " deltaY=" + evt.deltaY.toFixed(0) + ", " + evt.pageX.toFixed(0) + ", " + evt.pageY.toFixed(0));
             let twoD = screen.Screento2D(new V3Dtype(evt.pageX, evt.pageY, 0));
             //console.log(twoD.toString("2D"));
             let n = screen.twoDtoV3D(twoD.x, twoD.y);
@@ -99,10 +127,12 @@
                 let n1 = screen.ScreentoV3D(new V3Dtype(evt.pageX, evt.pageY, 0));
                 let np = n0.xproduct_n(n1);  // rotation axis
                 let angle = n0.angle(n1);
+                /*
                 console.log("angle = " + (angle / Math.PI * 180).toFixed(2))
                 console.log(n0.toString("n0"));
                 console.log(n1.toString("n1"));
                 console.log(np.toString("np"));
+                */
                 let m = new M3Dtype();
                 m.create_rot_n(np, -angle);
                 e = m.mmul(e);
@@ -112,19 +142,20 @@
         }
 
         function mouseClick(evt) {
-            console.log('click ' + evt.pageX.toFixed(0) + ', ' + evt.pageY.toFixed(0));
+            //console.log('click ' + evt.pageX.toFixed(0) + ', ' + evt.pageY.toFixed(0));
             let twoD = screen.Screento2D(new V3Dtype(evt.pageX, evt.pageY, 0));
-            console.log(twoD.toString("2D"));
+            //console.log(twoD.toString("2D"));
             let n = screen.twoDtoV3D(twoD.x, twoD.y);
-            console.log(n.toString("n") + n.toRADE().toString());
-            console.log("next star: " + print_V3D_next_star(n));
+            //console.log(n.toString("n") + n.toRADE().toString());
+            //console.log("next star: " + print_V3D_next_star(n));
+            print_V3D_next_star(n);
         }
 
         function mouseDown(evt) {
             mst = mst_down;
             mstart_x = evt.pageX;
             mstart_y = evt.pageY;
-            console.log('mousedown ' + evt.pageX.toFixed(0) + ', ' + evt.pageY.toFixed(0));
+            //console.log('mousedown ' + evt.pageX.toFixed(0) + ', ' + evt.pageY.toFixed(0));
         }
 
         function mouseUp(evt) {
@@ -138,18 +169,20 @@
         function mouseMove(evt) {
             switch (mst) {
                 case mst_down:
-                    console.log('mousestart ' + mstart_x.toFixed(0) + ', ' + mstart_y.toFixed(0));
-                    console.log('mousemove ' + evt.pageX.toFixed(0) + ', ' + evt.pageY.toFixed(0));
+                    //console.log('mousestart ' + mstart_x.toFixed(0) + ', ' + mstart_y.toFixed(0));
+                    //console.log('mousemove ' + evt.pageX.toFixed(0) + ', ' + evt.pageY.toFixed(0));
                     if (mstart_x == evt.pageX && mstart_y == evt.pageY) break;
                     {
                         let n0 = screen.ScreentoV3D(new V3Dtype(mstart_x, mstart_y, 0));
                         let n1 = screen.ScreentoV3D(new V3Dtype(evt.pageX, evt.pageY, 0));
                         let np = n0.xproduct_n(n1);  // rotation axis
                         let angle = n0.angle(n1);
+                        /*
                         console.log("angle = " + (angle / Math.PI * 180).toFixed(2))
                         console.log(n0.toString("n0"));
                         console.log(n1.toString("n1"));
                         console.log(np.toString("np"));
+                        */
                         let m = new M3Dtype();
                         m.create_rot_n(np, -angle);
                         e = m.mmul(e);
@@ -493,7 +526,7 @@
             }
         }
         // point of view
-        var ego = new RADEtype(0, 0, 0, 0);
+        var ego = new RADEtype(6, 0, 0, 0);
         var egoP = new RADEtype(0, 0, 90, 0);
         var e = ego.toV3D();
         var eP = egoP.toV3D();
@@ -634,6 +667,10 @@
             ctx.textBaseline = 'top'
             ctx.fillText(text, s1.x + sz, s1.y + sz);
         }
+        var fifo_i = 0;
+        var fifo = [];
+        fifo.push('');
+        fifo.push('');
         function print_V3D_next_star(n) {
             // n has format 3D (not RADE)
             let best_d = 100;
@@ -655,6 +692,12 @@
                 str += "\"";
                 str += stars[best_i].name;
                 str += "\"";
+                //
+                fifo[fifo_i] = stars[best_i].HD;
+                fifo_i = (fifo_i + 1) % 2;
+                if (fifo_i == 0) {
+                    console.log("'" + fifo[0] + "', '" + fifo[1] + "'");
+                }
             }
             return str;
         }
@@ -682,7 +725,7 @@
                 for (let i = 0; i < constellation.length; ++i) {
                     let s0 = lookup_star(constellation[i].HD0);
                     let s1 = lookup_star(constellation[i].HD1);
-                    draw_line_on_screen(ctx, s0, s1, 6, "G2");
+                    draw_line_on_screen(ctx, s0, s1, 8, "G2");
                 }
             }
             if (show_grid) {
