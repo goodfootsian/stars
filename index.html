@@ -109,7 +109,7 @@
                 let p0yn = this.p0y.n.clone();
                 v.add(p0xn.mul(x));
                 v.add(p0yn.mul(-y));
-                return v;
+                return v.normalize();
             }
             toString(name) {
                 let s = name;
@@ -213,6 +213,13 @@
             xproduct(b) {
                 let result = new V3Dtype(this.y * b.z - this.z * b.y, this.z * b.x - this.x * b.z, this.x * b.y - this.y * b.x);
                 return result;
+            }
+            normalize() {
+                let a = this.abs(this);
+                this.x /= a;
+                this.y /= a;
+                this.z /= a;
+                return this;
             }
             abs() {
                 return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
@@ -393,7 +400,7 @@
             // test SCREENtype
             console.log("test SCREENtype ");
             console.log(screen.toString("screen before"));
-            let starpos = new RADEtype(0, 0, 16, 0);
+            let starpos = new RADEtype(0, 0, 45, 0);
             console.log(starpos.toString("Polar"));
             let starpos_cart = starpos.toV3D();
             console.log(starpos_cart.toString("3D"));
