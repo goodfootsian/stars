@@ -103,13 +103,23 @@
                 return new V3Dtype((s.x - this.cwidth / 2) / this.magnification, (s.y - this.cheight / 2) / this.magnification, 0);
             }
             toV3D(x, y) {
-                let tmp = new V3Dtype((x - this.cwidth / 2) / this.magnification, (y - this.cheight / 2) / this.magnification, 0);
                 let v = this.na.n.clone();
+                console.log(v.toString("v"));
                 let p0xn = this.p0x.n.clone();
                 let p0yn = this.p0y.n.clone();
-                v.add(p0xn.mul(tmp.x));
-                v.add(p0yn.mul(-tmp.y));
+                v.add(p0xn.mul(x));
+                v.add(p0yn.mul(-y));
                 return v;
+            }
+            toString(name) {
+                let s = name;
+                if (name.length == 0) {
+                    name = "SCREEN";
+                }
+                s = s + "(";
+                s = s + this.na.toString("na") + this.p0x.toString("p0x") + this.p0y.toString("p0y");
+                return s;
+                s = s + ")";
             }
         }
 
@@ -276,9 +286,12 @@
                 return line.x(this.l);
             }
             to2D(p0x, p0y, n) {
-                let s2 = this.intersection_point(new NAtype(n, new V3Dtype(0, 0, 0)));
-                let s2x = -p0x.distance(s2);
-                let s2y = p0y.distance(s2);
+                let its = this.intersection_point(new NAtype(n, new V3Dtype(0, 0, 0)));
+                let x = -p0x.distance(its);
+                let y = p0y.distance(its);
+                // DEBUG begin
+                console.log("x=" + x.toFixed(2));
+                // DEBUG end
                 this.error = false;
                 if (this.l < 0) {
                     // the object is in our back
@@ -288,7 +301,7 @@
                     // the object is too far off the center of the screen
                     this.error = true;
                 }
-                return new V3Dtype(s2x, s2y, 0);
+                return new V3Dtype(x, y, 0);
             }
         }
         class M3Dtype
@@ -365,7 +378,7 @@
             }
         }
         // point of view
-        var ego = new RADEtype(5, 0, 0, 0);
+        var ego = new RADEtype(0, 0, 0, 0);
         var egoP = new RADEtype(0, 0, 90, 0);
         var e = ego.toV3D();
         var eP = egoP.toV3D();
@@ -373,23 +386,32 @@
         // the screen
         var screen = new SCREENtype(cwidth, cheight, 600);
         screen.p0x = new NAtype(e.xproduct(eP), e);
-        screen.p0y = new NAtype(eP, new V3Dtype(0, 0, 0));
+        screen.p0y = new NAtype(eP, e);
         screen.na = new NAtype(e, e);
         {
             // test SCREENtype
-            console.log("test SCREENtype");
-            let starpos = new RADEtype(6, 0, -16, 0);
+            console.log("test SCREENtype ");
+            console.log(screen.toString("screen before"));
+            let starpos = new RADEtype(0, 0, 16, 0);
+            console.log(starpos.toString("Polar"));
             let starpos_cart = starpos.toV3D();
-            console.log(starpos_cart.toRADE().toString("6, -16?"));
-            let s = screen.to_screen_coordinates2(starpos_cart);
+            console.log(starpos_cart.toString("3D"));
+            //let s = screen.to_screen_coordinates2(starpos_cart);
             let s2d = screen.na.to2D(screen.p0x, screen.p0y, starpos_cart);
+            console.log(s2d.toString("2D"));
             let ss = screen.twoDtoScreen(s2d);
+            console.log(ss.toString("Screen"));
             let s2d2 = screen.Screento2D(ss);
-            console.log(s2d.toString("s2d") + s2d2.toString("s2d2"));
-            let t = screen.toV3D(s.x, s.y);
+            console.log(s2d2.toString("back to 2D"));
+            //let t = screen.toV3D(s.x, s.y);
+            let t = screen.toV3D(s2d2.x, s2d2.y);
+            console.log(t.toString("back to 3D"));
             let u = t.toRADE();
-            console.log(starpos_cart.toString() + t.toString());
-            console.log(starpos.toString() + u.toString());
+            console.log(u.toString("back to Polar"));
+            console.log("cartesian coordinates before/after " + starpos_cart.toString() + t.toString());
+            console.log("polar coordinates before/after " + starpos.toString() + u.toString());
+            console.log(screen.toString("screen after"));
+            console.log("test SCREENtype END -----------------");
         }
         var show_grid = true;
         var show_names = true;
