@@ -110,6 +110,7 @@
                 case mst_down:
                     console.log('mousestart ' + mstart_x.toFixed(0) + ', ' + mstart_y.toFixed(0));
                     console.log('mousemove ' + evt.pageX.toFixed(0) + ', ' + evt.pageY.toFixed(0));
+                    if (mstart_x == evt.pageX && mstart_y == evt.pageY) break;
                     {
                         let n0 = screen.ScreentoV3D(new V3Dtype(mstart_x, mstart_y, 0));
                         let n1 = screen.ScreentoV3D(new V3Dtype(evt.pageX, evt.pageY, 0));
