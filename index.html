@@ -37,15 +37,8 @@
         constellation.push(new Ctype('Canis Major', '34444', '35904'));
         constellation.push(new Ctype('Canis Major', '32349', '34045'));
         constellation.push(new Ctype('Canis Major', '34045', '33160'));
-        constellation.push(new Ctype('Canis Major', 'xx', 'xx'));
-        constellation.push(new Ctype('Canis Major', 'xx', 'xx'));
-        constellation.push(new Ctype('Canis Major', 'xx', 'xx'));
-        constellation.push(new Ctype('Canis Major', 'xx', 'xx'));
-        constellation.push(new Ctype('Canis Major', 'xx', 'xx'));
-        constellation.push(new Ctype('Gemini', 'xx', 'xx'));
         constellation.push(new Ctype('Gemini', 'xx', 'xx'));
 
-        31681
         const canvas = document.querySelector('.myCanvas');
         const cwidth = canvas.width = window.innerWidth;
         const cheight = canvas.height = window.innerHeight;
@@ -138,25 +131,6 @@
             switch (mst) {
                 case mst_down:
                     mst = mst_free;
-                    /*
-                    console.log('mousestart ' + mstart_x.toFixed(0) + ', ' + mstart_y.toFixed(0));
-                    console.log('mouseup ' + evt.pageX.toFixed(0) + ', ' + evt.pageY.toFixed(0));
-                    {
-                        let n0 = screen.ScreentoV3D(new V3Dtype(mstart_x, mstart_y, 0));
-                        let n1 = screen.ScreentoV3D(new V3Dtype(evt.pageX, evt.pageY, 0));
-                        let np = n0.xproduct_n(n1);  // rotation axis
-                        let angle = n0.angle(n1);
-                        console.log("angle = " + (angle / Math.PI * 180).toFixed(2))
-                        console.log(n0.toString("n0"));
-                        console.log(n1.toString("n1"));
-                        console.log(np.toString("np"));
-                        let m = new M3Dtype();
-                        m.create_rot_n(np, -angle);
-                        e = m.mmul(e);
-                        eP = m.mmul(eP);
-                        ego = e.toRADE();
-                    }
-                    */
                     break;
             }
         }
@@ -407,8 +381,6 @@
             distance(q) {
                 // plane: distance to point
                 // with sign: positive if the point is in the direction of the normal vector n
-                //let delta = new V3Dtype;
-                //delta.copy(this.a);
                 let delta = this.a.clone();
                 delta.subtract(q);
                 return delta.sproduct(this.n);
@@ -572,16 +544,6 @@
         var show_grid = true;
         var show_names = true;
         var rot_deg = 5;
-        /*
-        {
-            for (i = 0; i < 360; i += 5) {
-                let i1 = new RADEtype(i / 360 * 24, 0, 0, 0);
-                let i2 = i1.toV3D();
-                let i3 = i2.toRADE();
-                console.log(i1.toString('RADE') + i2.toString('xy') + i3.toString('RADE'));
-            }
-        }
-        */
         {
             let n = new V3Dtype(0.99, 0.13, 0.06);
             let rade = n.toRADE();
@@ -664,12 +626,6 @@
         function draw_text_on_screen(ctx, p1, mag, color, text, magStar) {
             let s1c = p1.toV3D();
             let s1 = screen.V3DtoScreen(s1c);
-            /*
-            DEBUG please!
-            distance() should be zero!!
-            let s1c2 = screen.toV3D(s1.x, s1.y);
-            console.log(s1c.toString() + s1c2.toString() + ', distance=' + s1c.distance(s1c2));
-            */
             if (screen.na.error) return;
             let sz = get_star_radius(mag);
             ctx.fillStyle = getRGB(color, magStar);
@@ -818,12 +774,6 @@
                 + "N     switch star names on/off" + "<br>"
                 + "G     switch grid on/off" + "<br>"
                 ;
-            /*
-            ctx.fillStyle = 'orange';
-            ctx.fillText(ego.toString('View')
-                + ', stars=' + cnt.toString()
-                , 0, 50);
-                */
         }
 
         const st_insertcoin = 0;
