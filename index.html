@@ -56,7 +56,9 @@
 
         function mouseClick(evt) {
             console.log('click ' + evt.pageX.toFixed(0) + ', ' + evt.pageY.toFixed(0));
-            let n = screen.toV3D(evt.pageX, evt.pageY);
+            let twoD = screen.Screento2D(new V3Dtype(evt.pageX, evt.pageY, 0));
+            console.log(twoD.toString("2D"));
+            let n = screen.twoDtoV3D(twoD.x, twoD.y);
             console.log(n.toString("n") + n.toRADE().toString());
         }
 
@@ -91,7 +93,7 @@
                 this.p0x = 0;
                 this.p0y = 0;
             }
-            to_screen_coordinates2(n) {
+            to_screen_coordinates(n) {
                 let s2 = this.na.to2D(this.p0x, this.p0y, n);
                 return this.twoDtoScreen(s2);
                 //return new V3Dtype(this.cwidth / 2 + s2.x * this.magnification, this.cheight / 2 + s2.y * this.magnification, 0);
@@ -102,7 +104,7 @@
             Screento2D(s) {
                 return new V3Dtype((s.x - this.cwidth / 2) / this.magnification, (s.y - this.cheight / 2) / this.magnification, 0);
             }
-            toV3D(x, y) {
+            twoDtoV3D(x, y) {
                 let v = this.na.n.clone();
                 //console.log(v.toString("v"));
                 let p0xn = this.p0x.n.clone();
@@ -398,27 +400,39 @@
         screen.na = new NAtype(e, e);
         {
             // test SCREENtype
-            console.log("test SCREENtype ");
-            console.log(screen.toString("screen before"));
+            console.log("test SCREENtype part 1 ");
             let starpos = new RADEtype(0, 0, 45, 0);
-            console.log(starpos.toString("Polar"));
-            let starpos_cart = starpos.toV3D();
-            console.log(starpos_cart.toString("3D"));
-            //let s = screen.to_screen_coordinates2(starpos_cart);
-            let s2d = screen.na.to2D(screen.p0x, screen.p0y, starpos_cart);
-            console.log(s2d.toString("2D"));
-            let ss = screen.twoDtoScreen(s2d);
-            console.log(ss.toString("Screen"));
-            let s2d2 = screen.Screento2D(ss);
-            console.log(s2d2.toString("back to 2D"));
-            //let t = screen.toV3D(s.x, s.y);
-            let t = screen.toV3D(s2d2.x, s2d2.y);
-            console.log(t.toString("back to 3D"));
-            let u = t.toRADE();
-            console.log(u.toString("back to Polar"));
-            console.log("cartesian coordinates before/after " + starpos_cart.toString() + t.toString());
-            console.log("polar coordinates before/after " + starpos.toString() + u.toString());
-            console.log(screen.toString("screen after"));
+            {
+                console.log(screen.toString("screen before"));
+                console.log(starpos.toString("Polar"));
+                let starpos_cart = starpos.toV3D();
+                console.log(starpos_cart.toString("3D"));
+                let s2d = screen.na.to2D(screen.p0x, screen.p0y, starpos_cart);
+                console.log(s2d.toString("2D"));
+                let ss = screen.twoDtoScreen(s2d);
+                console.log(ss.toString("Screen"));
+                let s2d2 = screen.Screento2D(ss);
+                console.log(s2d2.toString("back to 2D"));
+                //let t = screen.toV3D(s.x, s.y);
+                let t = screen.twoDtoV3D(s2d2.x, s2d2.y);
+                console.log(t.toString("back to 3D"));
+                let u = t.toRADE();
+                console.log(u.toString("back to Polar"));
+                console.log("cartesian coordinates before/after " + starpos_cart.toString() + t.toString());
+                console.log("polar coordinates before/after " + starpos.toString() + u.toString());
+                console.log(screen.toString("screen after"));
+
+            }
+            {
+                console.log("test SCREENtype part 2 -----------------");
+                let s = screen.to_screen_coordinates(starpos.toV3D());
+                console.log(s.toString("Screen"));
+                let twoD = screen.Screento2D(s);
+                let t = screen.twoDtoV3D(twoD.x, twoD.y);
+                console.log(t.toString("back to 3D"));
+                let u = t.toRADE();
+                console.log(u.toString("back to Polar"));
+            }
             console.log("test SCREENtype END -----------------");
         }
         var show_grid = true;
@@ -501,21 +515,21 @@
         function draw_line_on_screen(ctx, p1, p2, mag, color) {
             let s1c = p1.toV3D();
             let s2c = p2.toV3D();
-            let s1 = screen.to_screen_coordinates2(s1c);
+            let s1 = screen.to_screen_coordinates(s1c);
             if (screen.na.error) return;
-            let s2 = screen.to_screen_coordinates2(s2c);
+            let s2 = screen.to_screen_coordinates(s2c);
             if (screen.na.error) return;
             draw_line(ctx, mag, color, s1.x, s1.y, s2.x, s2.y);
         }
         function draw_star_on_screen(ctx, p1, mag, color) {
             let s1c = p1.toV3D();
-            let s1 = screen.to_screen_coordinates2(s1c);
+            let s1 = screen.to_screen_coordinates(s1c);
             if (screen.na.error) return;
             draw_star(ctx, mag, color, s1.x, s1.y);
         }
         function draw_text_on_screen(ctx, p1, mag, color, text, magStar) {
             let s1c = p1.toV3D();
-            let s1 = screen.to_screen_coordinates2(s1c);
+            let s1 = screen.to_screen_coordinates(s1c);
             /*
             DEBUG please!
             distance() should be zero!!
