@@ -92,11 +92,12 @@
         }
 
         function mouseClick(evt) {
-            //console.log('click ' + evt.pageX.toFixed(0) + ', ' + evt.pageY.toFixed(0));
+            console.log('click ' + evt.pageX.toFixed(0) + ', ' + evt.pageY.toFixed(0));
             let twoD = screen.Screento2D(new V3Dtype(evt.pageX, evt.pageY, 0));
             console.log(twoD.toString("2D"));
             let n = screen.twoDtoV3D(twoD.x, twoD.y);
             console.log(n.toString("n") + n.toRADE().toString());
+            console.log("next star: " + print_V3D_next_star(n));
         }
 
         function mouseDown(evt) {
@@ -648,6 +649,30 @@
             ctx.textAlign = "left";
             ctx.textBaseline = 'top'
             ctx.fillText(text, s1.x + sz, s1.y + sz);
+        }
+        function print_V3D_next_star(n) {
+            // n has format 3D (not RADE)
+            let best_d = 100;
+            let best_i = -1;
+            for (let i = 0; i < stars.length; ++i) {
+                let starRADE = new RADEtype(stars[i].h, stars[i].dm, stars[i].d, stars[i].m);
+                let starpoint = starRADE.toV3D();
+                let d = starpoint.distance(n);
+                if (d < best_d) {
+                    best_d = d;
+                    best_i = i;
+                }
+            }
+            let str = "not found";
+            if (best_i >= 0) {
+                str = ""; //best_i.toFixed(0);
+                str += stars[best_i].HD;
+                str += " ";
+                str += "\"";
+                str += stars[best_i].name;
+                str += "\"";
+            }
+            return str;
         }
         function draw_field(ctx) {
             // fill with background color
