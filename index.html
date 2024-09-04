@@ -69,12 +69,26 @@
             let twoD = screen.Screento2D(new V3Dtype(evt.pageX, evt.pageY, 0));
             //console.log(twoD.toString("2D"));
             let n = screen.twoDtoV3D(twoD.x, twoD.y);
-            //console.log(n.toString("n") + n.toRADE().toString());
-            if (evt.deltaY > 0) {
-                screen.magnification /= 1.2;
-            } else if (evt.deltaY < 0) {
-                screen.magnification *= 1.2;
-            } 
+            {
+                let n0 = screen.ScreentoV3D(new V3Dtype(evt.pageX, evt.pageY, 0));
+                if (evt.deltaY > 0) {
+                    screen.magnification /= 1.2;
+                } else if (evt.deltaY < 0) {
+                    screen.magnification *= 1.2;
+                } 
+                let n1 = screen.ScreentoV3D(new V3Dtype(evt.pageX, evt.pageY, 0));
+                let np = n0.xproduct_n(n1);  // rotation axis
+                let angle = n0.angle(n1);
+                console.log("angle = " + (angle / Math.PI * 180).toFixed(2))
+                console.log(n0.toString("n0"));
+                console.log(n1.toString("n1"));
+                console.log(np.toString("np"));
+                let m = new M3Dtype();
+                m.create_rot_n(np, -angle);
+                e = m.mmul(e);
+                eP = m.mmul(eP);
+                ego = e.toRADE();
+            }
         }
 
         function mouseClick(evt) {
