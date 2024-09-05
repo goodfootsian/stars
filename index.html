@@ -113,28 +113,25 @@
         // mouse events
         const mst_free = 0;
         const mst_down = 1;
+        const mst_down2 = 2;
         var mst = mst_free;
         var mstart_x = 0;
         var mstart_y = 0;
+        var mstart1_x = 0;
+        var mstart1_y = 0;
         canvas.addEventListener("click", mouseClick);
         canvas.addEventListener("mousedown", mouseDown);
         canvas.addEventListener("mousemove", mouseMove);
         canvas.addEventListener("mouseup", mouseUp);
         canvas.addEventListener("wheel", mouseWheel);
 
-        function mouseWheel(evt) {
-            //console.log("wheel" + " deltaX=" + evt.deltaX.toFixed(0) + " deltaY=" + evt.deltaY.toFixed(0) + ", " + evt.pageX.toFixed(0) + ", " + evt.pageY.toFixed(0));
-            let twoD = screen.Screento2D(new V3Dtype(evt.pageX, evt.pageY, 0));
-            //console.log(twoD.toString("2D"));
-            let n = screen.twoDtoV3D(twoD.x, twoD.y);
+        function mtWheel(x, y, f) {
+            //let twoD = screen.Screento2D(new V3Dtype(x, y, 0));
+            //let n = screen.twoDtoV3D(twoD.x, twoD.y);
             {
-                let n0 = screen.ScreentoV3D(new V3Dtype(evt.pageX, evt.pageY, 0));
-                if (evt.deltaY > 0) {
-                    screen.magnification /= 1.2;
-                } else if (evt.deltaY < 0) {
-                    screen.magnification *= 1.2;
-                } 
-                let n1 = screen.ScreentoV3D(new V3Dtype(evt.pageX, evt.pageY, 0));
+                let n0 = screen.ScreentoV3D(new V3Dtype(x, y, 0));
+                screen.magnification *= f;
+                let n1 = screen.ScreentoV3D(new V3Dtype(x, y, 0));
                 let np = n0.xproduct_n(n1);  // rotation axis
                 let angle = n0.angle(n1);
                 /*
@@ -149,6 +146,33 @@
                 eP = m.mmul(eP);
                 ego = e.toRADE();
             }
+        }
+        function mouseWheel(evt) {
+            //console.log("wheel" + " deltaX=" + evt.deltaX.toFixed(0) + " deltaY=" + evt.deltaY.toFixed(0) + ", " + evt.pageX.toFixed(0) + ", " + evt.pageY.toFixed(0));
+            let f = 1.2;
+            if (evt.deltaY > 0) {
+                f = 1 / f;
+            } else if (evt.deltaY < 0) {
+                //
+            } 
+            mtWheel(evt.pageX, evt.pageY, f);
+            /*
+            let twoD = screen.Screento2D(new V3Dtype(evt.pageX, evt.pageY, 0));
+            //console.log(twoD.toString("2D"));
+            let n = screen.twoDtoV3D(twoD.x, twoD.y);
+            {
+                let n0 = screen.ScreentoV3D(new V3Dtype(evt.pageX, evt.pageY, 0));
+                screen.magnification *= f;
+                let n1 = screen.ScreentoV3D(new V3Dtype(evt.pageX, evt.pageY, 0));
+                let np = n0.xproduct_n(n1);  // rotation axis
+                let angle = n0.angle(n1);
+                let m = new M3Dtype();
+                m.create_rot_n(np, -angle);
+                e = m.mmul(e);
+                eP = m.mmul(eP);
+                ego = e.toRADE();
+            }
+            */
         }
 
         function mouseClick(evt) {
@@ -239,6 +263,14 @@
                 mstart_x = touches[0].pageX;
                 mstart_y = touches[0].pageY;
             }
+            else if (touches.length == 2) {
+                mst = mst_down2;
+                mstart_x = touches[0].pageX;
+                mstart_y = touches[0].pageY;
+                mstart1_x = touches[1].pageX;
+                mstart1_y = touches[1].pageY;
+            }
+
         }
         function touchEnd(evt) {
             text3.innerHTML = "<h2>touchEnd"
@@ -272,6 +304,34 @@
             if (touches.length == 1) {
                 mtMove(touches[0].pageX, touches[0].pageY);
             }
+            else if (touches.length == 2) {
+                switch (mst) {
+                    case mst_down:
+                        mst = mst_down2;
+                        mstart_x = touches[0].pageX;
+                        mstart_y = touches[0].pageY;
+                        mstart1_x = touches[1].pageX;
+                        mstart1_y = touches[1].pageY;
+                        break;
+                    case mst_down2:
+                        {
+                            let a0 = new V3Dtype(mstart_x, m_start_y, 0);
+                            let b0 = new V3Dtype(mstart1_x, mstart1_y, 0);
+                            let a1 = new V3Dtype(touches[0].pageX, touches[0].pageY, 0);
+                            let b1 = new V3Dtype(touches[1].pageX, touches[1].pageY, 0);
+                            let d0 = a0.distance(a1);
+                            let d1 = b0.distance(b1);
+                            let m = a0.clone();
+                            m.add(a1);
+                            m.add(b0);
+                            m.add(b1);
+                            m.mul(.25);
+                            mtWheel(m.x, m.y, d1/d0);
+                        }
+                        break;
+                }
+            }
+
         }
 
         var Tschioo = new Audio('Tschioo.mp3');
