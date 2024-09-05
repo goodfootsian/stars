@@ -72,6 +72,12 @@
         const cheight = canvas.height = window.innerHeight;
         const ctx = canvas.getContext('2d');
 
+        // game status
+        const st_insertcoin = 0;
+        const st_playing = 1;
+        const st_gameover = 2;
+        var status = st_insertcoin;
+
         // User Manual
         var text2 = document.createElement('div');
         text2.style.position = 'absolute';
@@ -210,6 +216,10 @@
         canvas.addEventListener("touchmove", touchMove);
 
         function touchStart(evt) {
+            if (status == st_insertcoin) {
+                Tetris.play();
+                status = st_playing;
+            }
             text3.innerHTML = "<h2>touchStart"
             text3.innerHTML += "<br>";
             evt.preventDefault();
@@ -271,7 +281,7 @@
         var Swoosh = new Audio('Swoosh.mp3');
         var Dioomm = new Audio('Dioomm.mp3');
         var Tetris = new Audio('stars theme.mp3');
-        Tetris.volume = 0.0;
+        Tetris.volume = 0.01;
 
         // my classes
         class RAtype {
@@ -886,10 +896,6 @@
                 ;
         }
 
-        const st_insertcoin = 0;
-        const st_playing = 1;
-        const st_gameover = 2;
-        var status = st_insertcoin;
         function loop() {
             if (status == st_insertcoin) {
                 //process event:
