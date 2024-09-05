@@ -70,8 +70,9 @@
         const canvas = document.querySelector('.myCanvas');
         const cwidth = canvas.width = window.innerWidth;
         const cheight = canvas.height = window.innerHeight;
+        const ctx = canvas.getContext('2d');
 
-        //
+        // User Manual
         var text2 = document.createElement('div');
         text2.style.position = 'absolute';
         text2.style.top = 10 + 'px';
@@ -79,26 +80,29 @@
         text2.style.width = 100;
         text2.style.height = 200;
         text2.style.fontSize = "12px";
-        text2.style.color = "#303080";
+        text2.style.color = "#505080";
         text2.style.backgroundColor = "#00000000";
         text2.innerHTML = ""
         document.body.appendChild(text2);
+
+        // Touch debug out
+        var text3 = document.createElement('div');
+        text3.style.position = 'absolute';
+        text3.style.top = 300 + 'px';
+        text3.style.left = 10 + 'px';
+        text3.style.width = 100;
+        text3.style.height = 200;
+        text3.style.fontSize = "12px";
+        text3.style.color = "#ffffff";
+        text3.style.backgroundColor = "#00000000";
+        text3.innerHTML = "T<br>T"
+        document.body.appendChild(text3);
 
         // event listeners
         var eventq = 0;
         document.addEventListener('keydown', function (event) {
             eventq = event.keyCode;
         });
-        // touch events
-        canvas.addEventListener("touchstart", handleStart);
-        canvas.addEventListener("touchend", handleEnd);
-        canvas.addEventListener("touchcancel", handleCancel);
-        canvas.addEventListener("touchmove", handleMove);
-
-        function handleStart() { }
-        function handleEnd() { }
-        function handleCancel() { }
-        function handleMove() { }
 
         // mouse events
         const mst_free = 0;
@@ -166,15 +170,13 @@
             }
         }
 
-        function mouseMove(evt) {
+        function mtMove(x, y) {
             switch (mst) {
                 case mst_down:
-                    //console.log('mousestart ' + mstart_x.toFixed(0) + ', ' + mstart_y.toFixed(0));
-                    //console.log('mousemove ' + evt.pageX.toFixed(0) + ', ' + evt.pageY.toFixed(0));
-                    if (mstart_x == evt.pageX && mstart_y == evt.pageY) break;
+                    if (mstart_x == x && mstart_y == y) break;
                     {
                         let n0 = screen.ScreentoV3D(new V3Dtype(mstart_x, mstart_y, 0));
-                        let n1 = screen.ScreentoV3D(new V3Dtype(evt.pageX, evt.pageY, 0));
+                        let n1 = screen.ScreentoV3D(new V3Dtype(x, y, 0));
                         let np = n0.xproduct_n(n1);  // rotation axis
                         let angle = n0.angle(n1);
                         /*
@@ -190,11 +192,75 @@
                         ego = e.toRADE();
 
                     }
-                    mstart_x = evt.pageX;
-                    mstart_y = evt.pageY;
+                    mstart_x = x;
+                    mstart_y = y;
                     break;
                 default:
                     break;
+            }
+        }
+        function mouseMove(evt) {
+            mtMove(evt.pageX, evt.pageY);
+        }
+
+        // touch events
+        canvas.addEventListener("touchstart", touchStart);
+        canvas.addEventListener("touchend", touchEnd);
+        canvas.addEventListener("touchcancel", touchCancel);
+        canvas.addEventListener("touchmove", touchMove);
+
+        function touchStart(evt) {
+            text3.innerHTML = "<h2>touchStart"
+            text3.innerHTML += "<br>";
+            evt.preventDefault();
+            const touches = evt.changedTouches;
+            console.log("touchStart - # of touch = " + touches.length.toFixed(0));
+            for (let i = 0; i < touches.length; i++) {
+                text3.innerHTML += "<h2>" + i.toString() + ": " + touches[i].pageX.toFixed(0) + ", " + touches[i].pageY.toFixed(0) + ", ";
+                text3.innerHTML += "<br>";
+                console.log(touches[i].pageX.toFixed(0) + ', ' + touches[i].pageY.toFixed(0));
+                ctx.fillStyle = 'rgb(5, 5, 25)';
+                ctx.fillRect(0, 0, cwidth, cheight);
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(touches[i].pageX, touches[i].pageY, 10, 10); // a circle at the start
+            }
+            if (touches.length == 1) {
+                mst = mst_down;
+                mstart_x = touches[0].pageX;
+                mstart_y = touches[0].pageY;
+            }
+        }
+        function touchEnd(evt) {
+            text3.innerHTML = "<h2>touchEnd"
+            text3.innerHTML += "<br>";
+            evt.preventDefault();
+            const touches = evt.changedTouches;
+            console.log("touchEnd - # of touch = " + touches.length.toFixed(0));
+            for (let i = 0; i < touches.length; i++) {
+                console.log('end! ' + touches[i].pageX.toFixed(0) + ', ' + touches[i].pageY.toFixed(0));
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(touches[i].pageX, touches[i].pageY, 10, 10); // a circle at the start
+            }
+        }
+        function touchCancel(evt) {
+            text3.innerHTML = "<h2>touchCancel"
+            text3.innerHTML += "<br>";
+        }
+        function touchMove(evt) {
+            text3.innerHTML = "<h2>touchMove"
+            text3.innerHTML += "<br>";
+            evt.preventDefault();
+            const touches = evt.changedTouches;
+            console.log("touchMove - # of touch = " + touches.length.toFixed(0));
+            for (let i = 0; i < touches.length; i++) {
+                text3.innerHTML += "<h2>" + i.toString() + ": " + touches[i].pageX.toFixed(0) + ", " + touches[i].pageY.toFixed(0) + ", ";
+                text3.innerHTML += "<br>";
+                console.log('move to ' + touches[i].pageX.toFixed(0) + ', ' + touches[i].pageY.toFixed(0));
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(touches[i].pageX, touches[i].pageY, 10, 10); // a circle at the start
+            }
+            if (touches.length == 1) {
+                mtMove(touches[0].pageX, touches[0].pageY);
             }
         }
 
@@ -623,7 +689,7 @@
             let s = rgb.toRGB();
             return s;
         }
-        function draw_star(ctx, mag, color, x, y) {
+        function draw_star(mag, color, x, y) {
             //let ulux = 1e8 * Math.pow(10, -0.4 * (mag + 14.2));
             let sz = get_star_radius(mag);
             ctx.fillStyle = getRGB(color, mag);
@@ -631,7 +697,7 @@
             ctx.arc(x, y, sz, 0, 2 * Math.PI);
             ctx.fill();
         }
-        function draw_line(ctx, mag, color, x0, y0, x1, y1) {
+        function draw_line(mag, color, x0, y0, x1, y1) {
             let sz = get_star_radius(mag);
             ctx.strokeStyle = getRGB(color, mag);
             // Start a new Path
@@ -641,22 +707,22 @@
             // Draw the Path
             ctx.stroke();
         }
-        function draw_line_on_screen(ctx, p1, p2, mag, color) {
+        function draw_line_on_screen(p1, p2, mag, color) {
             let s1c = p1.toV3D();
             let s2c = p2.toV3D();
             let s1 = screen.V3DtoScreen(s1c);
             if (screen.na.error) return;
             let s2 = screen.V3DtoScreen(s2c);
             if (screen.na.error) return;
-            draw_line(ctx, mag, color, s1.x, s1.y, s2.x, s2.y);
+            draw_line(mag, color, s1.x, s1.y, s2.x, s2.y);
         }
-        function draw_star_on_screen(ctx, p1, mag, color) {
+        function draw_star_on_screen(p1, mag, color) {
             let s1c = p1.toV3D();
             let s1 = screen.V3DtoScreen(s1c);
             if (screen.na.error) return;
-            draw_star(ctx, mag, color, s1.x, s1.y);
+            draw_star(mag, color, s1.x, s1.y);
         }
-        function draw_text_on_screen(ctx, p1, mag, color, text, magStar) {
+        function draw_text_on_screen(p1, mag, color, text, magStar) {
             let s1c = p1.toV3D();
             let s1 = screen.V3DtoScreen(s1c);
             if (screen.na.error) return;
@@ -710,7 +776,7 @@
             return new RADEtype(0, 0, 0, 0);
 
         }
-        function draw_field(ctx) {
+        function draw_field() {
             // fill with background color
             ctx.fillStyle = 'rgb(5, 5, 25)';
             ctx.fillRect(0, 0, cwidth, cheight);
@@ -725,41 +791,41 @@
                 for (let i = 0; i < constellation.length; ++i) {
                     let s0 = lookup_star(constellation[i].HD0);
                     let s1 = lookup_star(constellation[i].HD1);
-                    draw_line_on_screen(ctx, s0, s1, 8, "G2");
+                    draw_line_on_screen(s0, s1, 8, "G2");
                 }
             }
             if (show_grid) {
                 // draw north pole
                 {
-                    draw_line_on_screen(ctx, new RADEtype(0, 0, 88, 0), new RADEtype(12, 0, 88, 0), 6, "G2");
-                    draw_line_on_screen(ctx, new RADEtype(6, 0, 88, 0), new RADEtype(18, 0, 88, 0), 6, "G2");
-                    draw_text_on_screen(ctx, new RADEtype(0, 0, 90, 0), 1, "G2", "North Pole", 6);
+                    draw_line_on_screen(new RADEtype(0, 0, 88, 0), new RADEtype(12, 0, 88, 0), 6, "G2");
+                    draw_line_on_screen(new RADEtype(6, 0, 88, 0), new RADEtype(18, 0, 88, 0), 6, "G2");
+                    draw_text_on_screen(new RADEtype(0, 0, 90, 0), 1, "G2", "North Pole", 6);
                     /*
                     // color test
-                    draw_star_on_screen(ctx, new RADEtype(5, 0, 0, 0), -2, "O");
-                    draw_star_on_screen(ctx, new RADEtype(5, 200, 0, 0), -2, "B");
-                    draw_star_on_screen(ctx, new RADEtype(5, 400, 0, 0), -2, "A");
-                    draw_star_on_screen(ctx, new RADEtype(6, 0, 0, 0), -2, "F");
-                    draw_star_on_screen(ctx, new RADEtype(6, 200, 0, 0), -2, "G");
-                    draw_star_on_screen(ctx, new RADEtype(6, 400, 0, 0), -2, "K");
-                    draw_star_on_screen(ctx, new RADEtype(7, 0, 0, 0), -2, "M");
+                    draw_star_on_screen(new RADEtype(5, 0, 0, 0), -2, "O");
+                    draw_star_on_screen(new RADEtype(5, 200, 0, 0), -2, "B");
+                    draw_star_on_screen(new RADEtype(5, 400, 0, 0), -2, "A");
+                    draw_star_on_screen(new RADEtype(6, 0, 0, 0), -2, "F");
+                    draw_star_on_screen(new RADEtype(6, 200, 0, 0), -2, "G");
+                    draw_star_on_screen(new RADEtype(6, 400, 0, 0), -2, "K");
+                    draw_star_on_screen(new RADEtype(7, 0, 0, 0), -2, "M");
                     */
                 }
                 // draw south pole
                 {
-                    draw_line_on_screen(ctx, new RADEtype(0, 0, -88, 0), new RADEtype(12, 0, -88, 0), 6, "G2");
-                    draw_line_on_screen(ctx, new RADEtype(6, 0, -88, 0), new RADEtype(18, 0, -88, 0), 6, "G2");
-                    draw_text_on_screen(ctx, new RADEtype(0, 0, -90, 0), 1, "G2", "South Pole", 6);
+                    draw_line_on_screen(new RADEtype(0, 0, -88, 0), new RADEtype(12, 0, -88, 0), 6, "G2");
+                    draw_line_on_screen(new RADEtype(6, 0, -88, 0), new RADEtype(18, 0, -88, 0), 6, "G2");
+                    draw_text_on_screen(new RADEtype(0, 0, -90, 0), 1, "G2", "South Pole", 6);
                 }
                 // draw equator and wendekreise
                 for (let i = 0; i < 360; i += 2) {
                     const ecliptic_obliquity = 23.4; // degrees
                     const polar_de = 66.5; // degrees
-                    draw_line_on_screen(ctx, new RADEtype(i / 15, 0, 0, 0), new RADEtype((i + 1) / 15, 0, 0, 0), 6, "G2");
-                    draw_line_on_screen(ctx, new RADEtype(i / 15, 0, ecliptic_obliquity, 0), new RADEtype((i + 1) / 15, 0, ecliptic_obliquity, 0), 6, "G2");
-                    draw_line_on_screen(ctx, new RADEtype(i / 15, 0, -ecliptic_obliquity, 0), new RADEtype((i + 1) / 15, 0, -ecliptic_obliquity, 0), 6, "G2");
-                    draw_line_on_screen(ctx, new RADEtype(i / 15, 0, polar_de, 0), new RADEtype((i + 1) / 15, 0, polar_de, 0), 6, "B2");
-                    draw_line_on_screen(ctx, new RADEtype(i / 15, 0, -polar_de, 0), new RADEtype((i + 1) / 15, 0, -polar_de, 0), 6, "B2");
+                    draw_line_on_screen(new RADEtype(i / 15, 0, 0, 0), new RADEtype((i + 1) / 15, 0, 0, 0), 6, "G2");
+                    draw_line_on_screen(new RADEtype(i / 15, 0, ecliptic_obliquity, 0), new RADEtype((i + 1) / 15, 0, ecliptic_obliquity, 0), 6, "G2");
+                    draw_line_on_screen(new RADEtype(i / 15, 0, -ecliptic_obliquity, 0), new RADEtype((i + 1) / 15, 0, -ecliptic_obliquity, 0), 6, "G2");
+                    draw_line_on_screen(new RADEtype(i / 15, 0, polar_de, 0), new RADEtype((i + 1) / 15, 0, polar_de, 0), 6, "B2");
+                    draw_line_on_screen(new RADEtype(i / 15, 0, -polar_de, 0), new RADEtype((i + 1) / 15, 0, -polar_de, 0), 6, "B2");
                 }
                 // draw ecliptic
                 {
@@ -775,20 +841,20 @@
                         let pos0RADE = pos0.toRADE();
                         let pos1RADE = pos1.toRADE();
                         //console.log(pos0RADE.toString() + ' ' + pos0.toString() + ' => ' + pos1RADE.toString() + ' ' + pos1.toString());
-                        draw_line_on_screen(ctx, pos0RADE, pos1RADE, 6, "G2");
+                        draw_line_on_screen(pos0RADE, pos1RADE, 6, "G2");
                         pos0 = rot2deg.mmul(pos1);
                     }
-                    draw_text_on_screen(ctx, new RADEtype(0, 0, 0, 0), 1, "G2", "Frühlingspunkt", 6);
-                    draw_text_on_screen(ctx, new RADEtype(12, 0, 0, 0), 1, "G2", "Herbstpunkt", 6);
-                    draw_line_on_screen(ctx, new RADEtype(6, 0, 1, 0), new RADEtype(6, 0, -1, 0), 6, "G2");
-                    draw_text_on_screen(ctx, new RADEtype(6, 0, 0, 0), 1, "G2", "Sommersonnenwende", 6);
-                    draw_line_on_screen(ctx, new RADEtype(18, 0, 1, 0), new RADEtype(18, 0, -1, 0), 6, "G2");
-                    draw_text_on_screen(ctx, new RADEtype(18, 0, 0, 0), 1, "G2", "Wintersonnenwende", 6);
+                    draw_text_on_screen(new RADEtype(0, 0, 0, 0), 1, "G2", "Frühlingspunkt", 6);
+                    draw_text_on_screen(new RADEtype(12, 0, 0, 0), 1, "G2", "Herbstpunkt", 6);
+                    draw_line_on_screen(new RADEtype(6, 0, 1, 0), new RADEtype(6, 0, -1, 0), 6, "G2");
+                    draw_text_on_screen(new RADEtype(6, 0, 0, 0), 1, "G2", "Sommersonnenwende", 6);
+                    draw_line_on_screen(new RADEtype(18, 0, 1, 0), new RADEtype(18, 0, -1, 0), 6, "G2");
+                    draw_text_on_screen(new RADEtype(18, 0, 0, 0), 1, "G2", "Wintersonnenwende", 6);
                 }
                 // draw 0 and 12 meridian
                 for (let i = -90; i < 90; i += 2) {
-                    draw_line_on_screen(ctx, new RADEtype(0, 0, i, 0), new RADEtype(0, 0, i + 1, 0), 6, "G2");
-                    draw_line_on_screen(ctx, new RADEtype(12, 0, i, 0), new RADEtype(12, 0, i + 1, 0), 6, "G2");
+                    draw_line_on_screen(new RADEtype(0, 0, i, 0), new RADEtype(0, 0, i + 1, 0), 6, "G2");
+                    draw_line_on_screen(new RADEtype(12, 0, i, 0), new RADEtype(12, 0, i + 1, 0), 6, "G2");
                 }
             }
             // draw stars
@@ -798,9 +864,9 @@
                 //if (stars[i].h > 12) continue;
                 let starRADE = new RADEtype(stars[i].h, stars[i].dm, stars[i].d, stars[i].m);
                 let starpoint = starRADE.toV3D();
-                draw_star_on_screen(ctx, starRADE, stars[i].Ptm, stars[i].SpT);
+                draw_star_on_screen(starRADE, stars[i].Ptm, stars[i].SpT);
                 if (show_names && stars[i].name.length && stars[i].Ptm < 2.5) {
-                    draw_text_on_screen(ctx, starRADE, stars[i].Ptm, stars[i].SpT, stars[i].name, 6);
+                    draw_text_on_screen(starRADE, stars[i].Ptm, stars[i].SpT, stars[i].name, 6);
                 }
             }
             // inscription
@@ -816,6 +882,7 @@
                 + "R     roll right" + "<br>"
                 + "N     switch star names on/off" + "<br>"
                 + "G     switch grid on/off" + "<br>"
+                + "C     switch constellations on/off" + "<br>"
                 ;
         }
 
@@ -824,7 +891,6 @@
         const st_gameover = 2;
         var status = st_insertcoin;
         function loop() {
-            const ctx = canvas.getContext('2d');
             if (status == st_insertcoin) {
                 //process event:
                 switch (eventq) {

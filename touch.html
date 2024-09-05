@@ -55,16 +55,16 @@
 
 
         // touch events
-        canvas.addEventListener("touchstart", handleStart);
-        canvas.addEventListener("touchend", handleEnd);
-        canvas.addEventListener("touchcancel", handleCancel);
-        canvas.addEventListener("touchmove", handleMove);
+        canvas.addEventListener("touchstart", touchStart);
+        canvas.addEventListener("touchend", touchEnd);
+        canvas.addEventListener("touchcancel", touchCancel);
+        canvas.addEventListener("touchmove", touchMove);
 
-        function handleStart(evt) {
-            text3.innerHTML = "<h2>handleStart"
+        function touchStart(evt) {
+            text3.innerHTML = "<h2>touchStart"
             evt.preventDefault();
             const touches = evt.changedTouches;
-            console.log("handleStart - # of touch = " + touches.length.toFixed(0));
+            console.log("touchStart - # of touch = " + touches.length.toFixed(0));
             for (let i = 0; i < touches.length; i++) {
                 console.log(touches[i].pageX.toFixed(0) + ', ' + touches[i].pageY.toFixed(0));
                 ctx.fillStyle = 'rgb(5, 5, 25)';
@@ -73,25 +73,25 @@
                 ctx.fillRect(touches[i].pageX, touches[i].pageY, 10, 10); // a circle at the start
             }
         }
-        function handleEnd(evt) {
-            text3.innerHTML = "<h2>handleEnd"
+        function touchEnd(evt) {
+            text3.innerHTML = "<h2>touchEnd"
             evt.preventDefault();
             const touches = evt.changedTouches;
-            console.log("handleEnd - # of touch = " + touches.length.toFixed(0));
+            console.log("touchEnd - # of touch = " + touches.length.toFixed(0));
             for (let i = 0; i < touches.length; i++) {
                 console.log('end! ' + touches[i].pageX.toFixed(0) + ', ' + touches[i].pageY.toFixed(0));
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(touches[i].pageX, touches[i].pageY, 10, 10); // a circle at the start
             }
         }
-        function handleCancel(evt) {
-            text3.innerHTML = "<h2>handleCancel"
+        function touchCancel(evt) {
+            text3.innerHTML = "<h2>touchCancel"
         }
-        function handleMove(evt) {
-            text3.innerHTML = "<h2>handleMove"
+        function touchMove(evt) {
+            text3.innerHTML = "<h2>touchMove"
             evt.preventDefault();
             const touches = evt.changedTouches;
-            console.log("handleMove - # of touch = " + touches.length.toFixed(0));
+            console.log("touchMove - # of touch = " + touches.length.toFixed(0));
             for (let i = 0; i < touches.length; i++) {
                 console.log('move to ' + touches[i].pageX.toFixed(0) + ', ' + touches[i].pageY.toFixed(0));
                 ctx.fillStyle = '#ffffff';
