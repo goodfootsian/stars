@@ -113,7 +113,7 @@
         text3.style.width = 100;
         text3.style.height = 200;
         text3.style.fontSize = "12px";
-        text3.style.color = "#ffffff";
+        text3.style.color = "#ffff00";
         text3.style.backgroundColor = "#00000000";
         text3.innerHTML = "T<br>T"
         document.body.appendChild(text3);
@@ -315,6 +315,7 @@
                 text3.innerHTML += "tst=" + tst.toString() + "<br>";
                 switch (tst) {
                     case mst_free:
+                        text3.innerHTML += "FREE<br>";
                         tst = mst_down2;
                         mstart_x = touches[0].pageX;
                         mstart_y = touches[0].pageY;
@@ -322,6 +323,7 @@
                         mstart1_y = touches[1].pageY;
                         break;
                     case mst_down2:
+                        text3.innerHTML += "DOWN2<br>";
                         {
                             let a0 = new V3Dtype(mstart_x, m_start_y, 0);
                             let b0 = new V3Dtype(mstart1_x, mstart1_y, 0);
@@ -330,6 +332,7 @@
                             let d0 = a0.distance(a1);
                             let d1 = b0.distance(b1);
                             let m = a0.clone();
+                            text3.innerHTML += "DOWN2<br>";
                             m.add(a1);
                             m.add(b0);
                             m.add(b1);
