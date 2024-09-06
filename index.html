@@ -339,7 +339,10 @@
                             m.add(b0);
                             m.add(b1);
                             m.mul(.25);
-                            text3.innerHTML += m.toString("m") + ", d0=" + d0.toString() + ", d1=" + d1.toString();
+                            if (d0 < 1) break;
+                            if (d1 < 1) break;
+                            text3.innerHTML += m.toString("m") + "<br>d0=" + d0.toString() + "<br>d1=" + d1.toString();
+                            text3.innerHTML += "<br>d1/d0=" (d1/d0).toString();
                             text3.innerHTML += "<br>";
                             mtWheel(m.x, m.y, d1/d0);
                             mstart_x = touches[0].pageX;
