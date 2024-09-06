@@ -38,7 +38,6 @@
         constellation.push(new Ctype('Canis Major', '32349', '34045'));
         constellation.push(new Ctype('Canis Major', '34045', '33160'));
         constellation.push(new Ctype('Orion', 'xx', 'xx'));
-        //constellation.push(new Ctype('Orion', '27989', '25336'));
         constellation.push(new Ctype('Orion', '26727', '26311'));
         constellation.push(new Ctype('Orion', '26311', '25930'));
         constellation.push(new Ctype('Orion', '27366', '26727'));
@@ -114,7 +113,7 @@
         text3.style.width = 100;
         text3.style.height = 200;
         text3.style.fontSize = "12px";
-        text3.style.color = "#00ff00";
+        text3.style.color = "#ffffff";
         text3.style.backgroundColor = "#00000000";
         text3.innerHTML = "T<br>T"
         document.body.appendChild(text3);
@@ -134,6 +133,10 @@
         var mstart_y = 0;
         var mstart1_x = 0;
         var mstart1_y = 0;
+        // double touch status
+        var tst = mst_free;
+
+        // add event listeners
         canvas.addEventListener("click", mouseClick);
         canvas.addEventListener("mousedown", mouseDown);
         canvas.addEventListener("mousemove", mouseMove);
@@ -262,7 +265,7 @@
                 mstart_y = touches[0].pageY;
             }
             else if (touches.length == 2) {
-                mst = mst_down2;
+                tst = mst_down2;
                 mstart_x = touches[0].pageX;
                 mstart_y = touches[0].pageY;
                 mstart1_x = touches[1].pageX;
@@ -281,10 +284,12 @@
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(touches[i].pageX, touches[i].pageY, 10, 10); // a circle at the start
             }
+            tst = mst_free;
         }
         function touchCancel(evt) {
             text3.innerHTML = "<h2>touchCancel"
             text3.innerHTML += "<br>";
+            tst = mst_free;
         }
         function touchMove(evt) {
             text3.innerHTML = "<h2>touchMove"
@@ -307,11 +312,10 @@
                 }
             }
             else if (touches.length == 2) {
-                text3.innerHTML += "LENGTH(2)";
-                switch (mst) {
-                    case mst_down:
+                text3.innerHTML += "tst=" + tst.toString() + "<br>";
+                switch (tst) {
                     case mst_free:
-                        mst = mst_down2;
+                        tst = mst_down2;
                         mstart_x = touches[0].pageX;
                         mstart_y = touches[0].pageY;
                         mstart1_x = touches[1].pageX;
