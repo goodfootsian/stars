@@ -66,7 +66,22 @@
         constellation.push(new Ctype('Lyra', '92791', '93194'));
         constellation.push(new Ctype('Lyra', '93194', '92420'));
         constellation.push(new Ctype('Lyra', '92420', '91971'));
+        constellation.push(new Ctype('Ursa Major', '54061', '53910'));
+        constellation.push(new Ctype('Ursa Major', '53910', '58001'));
+        constellation.push(new Ctype('Ursa Major', '58001', '59774'));
+        constellation.push(new Ctype('Ursa Major', '59774', '54061'));
+        constellation.push(new Ctype('Ursa Major', '59774', '62956'));
+        constellation.push(new Ctype('Ursa Major', '62956', '65477'));
+        constellation.push(new Ctype('Ursa Major', '65378', '67301'));
+        constellation.push(new Ctype('Ursa Minor', '11767', '85822'));
+        constellation.push(new Ctype('Ursa Minor', '85822', '82080'));
+        constellation.push(new Ctype('Ursa Minor', '82080', '77055'));
+        constellation.push(new Ctype('Ursa Minor', '77055', '79822'));
+        constellation.push(new Ctype('Ursa Minor', '79822', '75097'));
+        constellation.push(new Ctype('Ursa Minor', '75097', '72607'));
+        constellation.push(new Ctype('Ursa Minor', '72607', '77055'));
 
+        // canvas
         const canvas = document.querySelector('.myCanvas');
         const cwidth = canvas.width = window.innerWidth;
         const cheight = canvas.height = window.innerHeight;
@@ -99,7 +114,7 @@
         text3.style.width = 100;
         text3.style.height = 200;
         text3.style.fontSize = "12px";
-        text3.style.color = "#ffff00";
+        text3.style.color = "#0000ff";
         text3.style.backgroundColor = "#00000000";
         text3.innerHTML = "T<br>T"
         document.body.appendChild(text3);
@@ -156,23 +171,6 @@
                 //
             } 
             mtWheel(evt.pageX, evt.pageY, f);
-            /*
-            let twoD = screen.Screento2D(new V3Dtype(evt.pageX, evt.pageY, 0));
-            //console.log(twoD.toString("2D"));
-            let n = screen.twoDtoV3D(twoD.x, twoD.y);
-            {
-                let n0 = screen.ScreentoV3D(new V3Dtype(evt.pageX, evt.pageY, 0));
-                screen.magnification *= f;
-                let n1 = screen.ScreentoV3D(new V3Dtype(evt.pageX, evt.pageY, 0));
-                let np = n0.xproduct_n(n1);  // rotation axis
-                let angle = n0.angle(n1);
-                let m = new M3Dtype();
-                m.create_rot_n(np, -angle);
-                e = m.mmul(e);
-                eP = m.mmul(eP);
-                ego = e.toRADE();
-            }
-            */
         }
 
         function mouseClick(evt) {
@@ -295,7 +293,7 @@
             const touches = evt.changedTouches;
             console.log("touchMove - # of touch = " + touches.length.toFixed(0));
             for (let i = 0; i < touches.length; i++) {
-                text3.innerHTML += "<h2>" + i.toString() + ": " + touches[i].pageX.toFixed(0) + ", " + touches[i].pageY.toFixed(0) + ", ";
+                text3.innerHTML += "<code>" + i.toString() + ": " + touches[i].pageX.toFixed(0) + ", " + touches[i].pageY.toFixed(0) + ", ";
                 text3.innerHTML += "<br>";
                 console.log('move to ' + touches[i].pageX.toFixed(0) + ', ' + touches[i].pageY.toFixed(0));
                 ctx.fillStyle = '#ffffff';
@@ -326,6 +324,8 @@
                             m.add(b0);
                             m.add(b1);
                             m.mul(.25);
+                            text3.innerHTML += m.toString("m") + ", d0=" + d0.toString() + ", d1=" + d1.toString();
+                            text3.innerHTML += "<br>";
                             mtWheel(m.x, m.y, d1/d0);
                             mstart_x = touches[0].pageX;
                             mstart_y = touches[0].pageY;
@@ -836,7 +836,7 @@
                 fifo[fifo_i] = stars[best_i].HD;
                 fifo_i = (fifo_i + 1) % 2;
                 if (fifo_i == 0) {
-                    console.log("'" + fifo[0] + "', '" + fifo[1] + "'");
+                    console.log("constellation.push(new Ctype('unknown', '" + fifo[0] + "', '" + fifo[1] + "'));");
                 }
             }
             return str;
