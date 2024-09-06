@@ -291,6 +291,9 @@
             text3.innerHTML += "<br>";
             tst = mst_free;
         }
+        function tZoom() {
+
+        }
         function touchMove(evt) {
             text3.innerHTML = "<h2>touchMove"
             text3.innerHTML += "<br>";
@@ -326,13 +329,19 @@
                         text3.innerHTML += "DOWN2<br>";
                         {
                             let a0 = new V3Dtype(mstart_x, m_start_y, 0);
+                            text3.innerHTML += "DOWN3<br>";
                             let b0 = new V3Dtype(mstart1_x, mstart1_y, 0);
+                            text3.innerHTML += "DOWN4<br>";
                             let a1 = new V3Dtype(touches[0].pageX, touches[0].pageY, 0);
+                            text3.innerHTML += "DOWN5<br>";
                             let b1 = new V3Dtype(touches[1].pageX, touches[1].pageY, 0);
+                            text3.innerHTML += "DOWN6<br>";
                             let d0 = a0.distance(a1);
+                            text3.innerHTML += "DOWN7<br>";
                             let d1 = b0.distance(b1);
+                            text3.innerHTML += "DOWN8<br>";
                             let m = a0.clone();
-                            text3.innerHTML += "DOWN2<br>";
+                            text3.innerHTML += "DOWN9<br>";
                             m.add(a1);
                             m.add(b0);
                             m.add(b1);
