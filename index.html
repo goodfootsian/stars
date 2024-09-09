@@ -309,6 +309,7 @@
             if (touches.length == 1) {
                 switch (mst) {
                     case mst_down:
+                        console.log("t1move, " + touches[0].pageX.toFixed(0) + ", " + touches[0].pageY.toFixed(0));
                         mtMove(touches[0].pageX, touches[0].pageY);
                         break;
                 }
@@ -347,7 +348,7 @@
                             text3.innerHTML += m.toString("m") + "<br>d0=" + d0.toString() + "<br>d1=" + d1.toString();
                             text3.innerHTML += "<br>d1/d0=" + (d1/d0).toString();
                             text3.innerHTML += "<br>";
-                            console.log(touches[0].pageX.toFixed(0) + ", " + touches[0].pageY.toFixed(0) + " ||| " + touches[1].pageX.toFixed(0) + ", " + touches[1].pageY.toFixed(0) + ", d0=" + d0.toFixed(2) + ", " + m.toString("m") + ", magnification=" + screen.magnification.toFixed(2));
+                            console.log("t2move, " + touches[0].pageX.toFixed(0) + ", " + touches[0].pageY.toFixed(0) + " ||| " + touches[1].pageX.toFixed(0) + ", " + touches[1].pageY.toFixed(0) + ", d0=" + d0.toFixed(2) + ", " + m.toString("m") + ", magnification=" + screen.magnification.toFixed(2));
                             mtWheel(m.x, m.y, d1/d0);
                             mstart_x = touches[0].pageX;
                             mstart_y = touches[0].pageY;
