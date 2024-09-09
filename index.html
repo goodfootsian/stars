@@ -105,19 +105,6 @@
         text2.innerHTML = ""
         document.body.appendChild(text2);
 
-        // Touch debug out
-        var text3 = document.createElement('div');
-        text3.style.position = 'absolute';
-        text3.style.top = 300 + 'px';
-        text3.style.left = 10 + 'px';
-        text3.style.width = 100;
-        text3.style.height = 200;
-        text3.style.fontSize = "12px";
-        text3.style.color = "#00ff00";
-        text3.style.backgroundColor = "#00000000";
-        text3.innerHTML = "T<br>T"
-        document.body.appendChild(text3);
-
         // event listeners
         var eventq = 0;
         document.addEventListener('keydown', function (event) {
@@ -243,14 +230,10 @@
                 status = st_playing;
                 return;
             }
-            text3.innerHTML = "<h2>touchStart"
-            text3.innerHTML += "<br>";
             evt.preventDefault();
             const touches = evt.changedTouches;
             console.log("touchStart - # of touch = " + touches.length.toFixed(0));
             for (let i = 0; i < touches.length; i++) {
-                text3.innerHTML += "<h2>" + i.toString() + ": " + touches[i].pageX.toFixed(0) + ", " + touches[i].pageY.toFixed(0) + ", ";
-                text3.innerHTML += "<br>";
                 console.log(touches[i].pageX.toFixed(0) + ', ' + touches[i].pageY.toFixed(0));
                 ctx.fillStyle = 'rgb(5, 5, 25)';
                 ctx.fillRect(0, 0, cwidth, cheight);
@@ -273,8 +256,6 @@
             }
         }
         function touchEnd(evt) {
-            //text3.innerHTML = "<h2>touchEnd"
-            //text3.innerHTML += "<br>";
             evt.preventDefault();
             const touches = evt.changedTouches;
             console.log("touchEnd - # of touch = " + touches.length.toFixed(0));
@@ -286,22 +267,16 @@
             mst = mst_free;
         }
         function touchCancel(evt) {
-            text3.innerHTML = "<h2>touchCancel"
-            text3.innerHTML += "<br>";
             mst = mst_free;
         }
         function tZoom() {
 
         }
         function touchMove(evt) {
-            text3.innerHTML = "<h2>touchMove"
-            text3.innerHTML += "<br>";
             evt.preventDefault();
             const touches = evt.changedTouches;
             //console.log("touchMove - # of touch = " + touches.length.toFixed(0));
             for (let i = 0; i < touches.length; i++) {
-                text3.innerHTML += "<code>" + i.toString() + ": " + touches[i].pageX.toFixed(0) + ", " + touches[i].pageY.toFixed(0) + ", ";
-                text3.innerHTML += "<br>";
                 //console.log('move to ' + touches[i].pageX.toFixed(0) + ', ' + touches[i].pageY.toFixed(0));
                 //ctx.fillStyle = '#ffffff';
                 //ctx.fillRect(touches[i].pageX, touches[i].pageY, 10, 10); // a circle at the start
@@ -315,11 +290,9 @@
                 }
             }
             else if (touches.length == 2) {
-                text3.innerHTML += "mst=" + mst.toString() + "<br>";
                 switch (mst) {
                     case mst_free:
                     case mst_down:
-                        text3.innerHTML += "FREE<br>";
                         mst = mst_down2;
                         mstart_x = touches[0].pageX;
                         mstart_y = touches[0].pageY;
@@ -327,7 +300,6 @@
                         mstart1_y = touches[1].pageY;
                         break;
                     case mst_down2:
-                        text3.innerHTML += "DOWN2<br>";
                         {
                             let a0 = new V3Dtype(mstart_x, mstart_y, 0);
                             let b0 = new V3Dtype(mstart1_x, mstart1_y, 0);
@@ -346,9 +318,6 @@
                             //console.log("start points: " + a0.toString("a0") + " " + b0.toString("b0") + " d0=" + d0);
                             //console.log("end points: " + a1.toString("a0") + " " + b1.toString("b0") + " d1=" + d0);
                             //console.log("middle point: " + m.toString("m") + ", d1/d0=" + (d1 / d0).toFixed(2));
-                            text3.innerHTML += m.toString("m") + "<br>d0=" + d0.toString() + "<br>d1=" + d1.toString();
-                            text3.innerHTML += "<br>d1/d0=" + (d1/d0).toString();
-                            text3.innerHTML += "<br>";
                             console.log("t2move, " + touches[0].pageX.toFixed(0) + ", " + touches[0].pageY.toFixed(0) + " ||| " + touches[1].pageX.toFixed(0) + ", " + touches[1].pageY.toFixed(0) + ", d0=" + d0.toFixed(2) + ", " + m.toString("m") + ", magnification=" + screen.magnification.toFixed(2));
                             mtWheel(m.x, m.y, d1/d0);
                             mstart_x = touches[0].pageX;
@@ -358,7 +327,6 @@
                         }
                         break;
                     default:
-                        text3.innerHTML += "DEFAULT<br>";
                         break;
                 }
             }
