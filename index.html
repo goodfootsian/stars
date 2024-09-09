@@ -133,8 +133,6 @@
         var mstart_y = 0;
         var mstart1_x = 0;
         var mstart1_y = 0;
-        // double touch status
-        var tst = mst_free;
 
         // add event listeners
         canvas.addEventListener("click", mouseClick);
@@ -266,7 +264,7 @@
                 console.log("t1start, " + touches[0].pageX.toFixed(0) + ", " + touches[0].pageY.toFixed(0));
             }
             else if (touches.length == 2) {
-                tst = mst_down2;
+                mst = mst_down2;
                 mstart_x = touches[0].pageX;
                 mstart_y = touches[0].pageY;
                 mstart1_x = touches[1].pageX;
@@ -285,12 +283,12 @@
                 //ctx.fillStyle = '#ffffff';
                 //ctx.fillRect(touches[i].pageX, touches[i].pageY, 10, 10); // a circle at the start
             }
-            tst = mst_free;
+            mst = mst_free;
         }
         function touchCancel(evt) {
             text3.innerHTML = "<h2>touchCancel"
             text3.innerHTML += "<br>";
-            tst = mst_free;
+            mst = mst_free;
         }
         function tZoom() {
 
@@ -317,11 +315,12 @@
                 }
             }
             else if (touches.length == 2) {
-                text3.innerHTML += "tst=" + tst.toString() + "<br>";
-                switch (tst) {
+                text3.innerHTML += "mst=" + mst.toString() + "<br>";
+                switch (mst) {
                     case mst_free:
+                    case mst_down:
                         text3.innerHTML += "FREE<br>";
-                        tst = mst_down2;
+                        mst = mst_down2;
                         mstart_x = touches[0].pageX;
                         mstart_y = touches[0].pageY;
                         mstart1_x = touches[1].pageX;
