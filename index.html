@@ -242,8 +242,8 @@
 
         function touchStart(evt) {
             if (status == st_insertcoin) {
-                Tetris.play();
                 status = st_playing;
+                break;
             }
             text3.innerHTML = "<h2>touchStart"
             text3.innerHTML += "<br>";
@@ -299,7 +299,7 @@
             text3.innerHTML += "<br>";
             evt.preventDefault();
             const touches = evt.changedTouches;
-            console.log("touchMove - # of touch = " + touches.length.toFixed(0));
+            //console.log("touchMove - # of touch = " + touches.length.toFixed(0));
             for (let i = 0; i < touches.length; i++) {
                 text3.innerHTML += "<code>" + i.toString() + ": " + touches[i].pageX.toFixed(0) + ", " + touches[i].pageY.toFixed(0) + ", ";
                 text3.innerHTML += "<br>";
@@ -341,6 +341,7 @@
                             m.mul(.25);
                             if (d0 < 1) break;
                             if (d1 < 1) break;
+                            if (d0 == d1) break;
                             //console.log("start points: " + a0.toString("a0") + " " + b0.toString("b0") + " d0=" + d0);
                             //console.log("end points: " + a1.toString("a0") + " " + b1.toString("b0") + " d1=" + d0);
                             //console.log("middle point: " + m.toString("m") + ", d1/d0=" + (d1 / d0).toFixed(2));
