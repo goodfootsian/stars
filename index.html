@@ -263,6 +263,7 @@
                 mst = mst_down;
                 mstart_x = touches[0].pageX;
                 mstart_y = touches[0].pageY;
+                console.log("t1start, " + touches[0].pageX.toFixed(0) + ", " + touches[0].pageY.toFixed(0));
             }
             else if (touches.length == 2) {
                 tst = mst_down2;
@@ -270,6 +271,7 @@
                 mstart_y = touches[0].pageY;
                 mstart1_x = touches[1].pageX;
                 mstart1_y = touches[1].pageY;
+                console.log("t2start, " + touches[0].pageX.toFixed(0) + ", " + touches[0].pageY.toFixed(0) + " ||| " + touches[1].pageX.toFixed(0) + ", " + touches[1].pageY.toFixed(0));
             }
         }
         function touchEnd(evt) {
@@ -279,9 +281,9 @@
             const touches = evt.changedTouches;
             console.log("touchEnd - # of touch = " + touches.length.toFixed(0));
             for (let i = 0; i < touches.length; i++) {
-                console.log('end! ' + touches[i].pageX.toFixed(0) + ', ' + touches[i].pageY.toFixed(0));
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(touches[i].pageX, touches[i].pageY, 10, 10); // a circle at the start
+                //console.log('end! ' + touches[i].pageX.toFixed(0) + ', ' + touches[i].pageY.toFixed(0));
+                //ctx.fillStyle = '#ffffff';
+                //ctx.fillRect(touches[i].pageX, touches[i].pageY, 10, 10); // a circle at the start
             }
             tst = mst_free;
         }
