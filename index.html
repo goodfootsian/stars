@@ -303,7 +303,7 @@
             for (let i = 0; i < touches.length; i++) {
                 text3.innerHTML += "<code>" + i.toString() + ": " + touches[i].pageX.toFixed(0) + ", " + touches[i].pageY.toFixed(0) + ", ";
                 text3.innerHTML += "<br>";
-                console.log('move to ' + touches[i].pageX.toFixed(0) + ', ' + touches[i].pageY.toFixed(0));
+                //console.log('move to ' + touches[i].pageX.toFixed(0) + ', ' + touches[i].pageY.toFixed(0));
                 //ctx.fillStyle = '#ffffff';
                 //ctx.fillRect(touches[i].pageX, touches[i].pageY, 10, 10); // a circle at the start
             }
@@ -332,8 +332,8 @@
                             let b0 = new V3Dtype(mstart1_x, mstart1_y, 0);
                             let a1 = new V3Dtype(touches[0].pageX, touches[0].pageY, 0);
                             let b1 = new V3Dtype(touches[1].pageX, touches[1].pageY, 0);
-                            let d0 = a0.distance(a1);
-                            let d1 = b0.distance(b1);
+                            let d0 = a0.distance(b0);
+                            let d1 = a1.distance(b1);
                             let m = a0.clone();
                             m.add(a1);
                             m.add(b0);
@@ -341,6 +341,9 @@
                             m.mul(.25);
                             if (d0 < 1) break;
                             if (d1 < 1) break;
+                            console.log("start points: " + a0.toString("a0") + " " + b0.toString("b0") + " d0=" + d0);
+                            console.log("end points: " + a1.toString("a0") + " " + b1.toString("b0") + " d1=" + d0);
+                            console.log("middle point: " + m.toString("m"));
                             text3.innerHTML += m.toString("m") + "<br>d0=" + d0.toString() + "<br>d1=" + d1.toString();
                             text3.innerHTML += "<br>d1/d0=" + (d1/d0).toString();
                             text3.innerHTML += "<br>";
