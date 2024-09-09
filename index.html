@@ -315,6 +315,8 @@
                 }
             }
             else if (touches.length == 2) {
+                console.log(touches[0].pageX.toFixed(0) + ", " + touches[0].pageY.toFixed(0) + " ||| "touches[1].pageX.toFixed(0) + ", " + touches[1].pageY.toFixed(0));
+
                 text3.innerHTML += "tst=" + tst.toString() + "<br>";
                 switch (tst) {
                     case mst_free:
@@ -341,9 +343,9 @@
                             m.mul(.25);
                             if (d0 < 1) break;
                             if (d1 < 1) break;
-                            console.log("start points: " + a0.toString("a0") + " " + b0.toString("b0") + " d0=" + d0);
-                            console.log("end points: " + a1.toString("a0") + " " + b1.toString("b0") + " d1=" + d0);
-                            console.log("middle point: " + m.toString("m") + ", d1/d0=" + (d1 / d0).toFixed(2));
+                            //console.log("start points: " + a0.toString("a0") + " " + b0.toString("b0") + " d0=" + d0);
+                            //console.log("end points: " + a1.toString("a0") + " " + b1.toString("b0") + " d1=" + d0);
+                            //console.log("middle point: " + m.toString("m") + ", d1/d0=" + (d1 / d0).toFixed(2));
                             text3.innerHTML += m.toString("m") + "<br>d0=" + d0.toString() + "<br>d1=" + d1.toString();
                             text3.innerHTML += "<br>d1/d0=" + (d1/d0).toString();
                             text3.innerHTML += "<br>";
