@@ -407,6 +407,9 @@
                 this.d = d;    // positive is north, negative is south
                 this.m = m;
             }
+            clone(a) {
+                return new RADEtype(this.h, this.dm, this.d, this.m);
+            }
             toString(name = 'RADE') {
                 let s = name + '(RA=' + this.h.toFixed(2) + ', dm=' + this.dm.toFixed(2) + ', DE=' + this.d.toFixed(2) + ', m=' + this.m.toFixed(2) + ')';
                 return s;
@@ -828,6 +831,24 @@
             if (screen.na.error) return;
             draw_star(mag, color, s1.x, s1.y);
         }
+        function draw_planet_on_screen(p1, minutes, color) {
+            // calculate position on screen
+            let s1c = p1.toV3D();
+            let r = 0.5 * minutes / 60 * Math.PI / 180;
+            let s1 = screen.V3DtoScreen(s1c);
+            if (screen.na.error) return;
+            // calculate position of border point on screen
+            let sp = s1c.clone();
+            let rvec = eP.clone();
+            sp.add(rvec.mul(r));
+            let s2 = screen.V3DtoScreen(sp);
+            //
+            let sz = s2.distance(s1);
+            ctx.fillStyle = getRGB(color, 0);
+            ctx.beginPath();
+            ctx.arc(s1.x, s1.y, sz, 0, 2 * Math.PI);
+            ctx.fill();
+        }
         function draw_text_on_screen(p1, mag, color, text, magStar) {
             let s1c = p1.toV3D();
             let s1 = screen.V3DtoScreen(s1c);
@@ -977,7 +998,7 @@
             }
             // draw sun
             {
-                draw_star_on_screen(Sun, -3, "G2");
+                draw_planet_on_screen(Sun, 31, "G2");
             }
             // inscription
             text2.innerHTML = "<h2>"
