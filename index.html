@@ -235,10 +235,6 @@
             console.log("touchStart - # of touch = " + touches.length.toFixed(0));
             for (let i = 0; i < touches.length; i++) {
                 console.log(touches[i].pageX.toFixed(0) + ', ' + touches[i].pageY.toFixed(0));
-                ctx.fillStyle = 'rgb(5, 5, 25)';
-                ctx.fillRect(0, 0, cwidth, cheight);
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(touches[i].pageX, touches[i].pageY, 10, 10); // a circle at the start
             }
             if (touches.length == 1) {
                 mst = mst_down;
@@ -261,8 +257,6 @@
             console.log("touchEnd - # of touch = " + touches.length.toFixed(0));
             for (let i = 0; i < touches.length; i++) {
                 //console.log('end! ' + touches[i].pageX.toFixed(0) + ', ' + touches[i].pageY.toFixed(0));
-                //ctx.fillStyle = '#ffffff';
-                //ctx.fillRect(touches[i].pageX, touches[i].pageY, 10, 10); // a circle at the start
             }
             mst = mst_free;
         }
@@ -278,8 +272,6 @@
             //console.log("touchMove - # of touch = " + touches.length.toFixed(0));
             for (let i = 0; i < touches.length; i++) {
                 //console.log('move to ' + touches[i].pageX.toFixed(0) + ', ' + touches[i].pageY.toFixed(0));
-                //ctx.fillStyle = '#ffffff';
-                //ctx.fillRect(touches[i].pageX, touches[i].pageY, 10, 10); // a circle at the start
             }
             if (touches.length == 1) {
                 switch (mst) {
@@ -906,7 +898,7 @@
         }
         function draw_field() {
             // fill with background color
-            ctx.fillStyle = 'rgb(5, 5, 25)';
+            ctx.fillStyle = 'rgb(0, 0, 0)';
             ctx.fillRect(0, 0, cwidth, cheight);
             // text
             ctx.fillStyle = 'blue';
