@@ -973,9 +973,9 @@
                     }
                     draw_text_on_screen(new RADEtype(0, 0, 0, 0), 1, "G2", "Frühlingspunkt", 6);
                     draw_text_on_screen(new RADEtype(12, 0, 0, 0), 1, "G2", "Herbstpunkt", 6);
-                    draw_line_on_screen(new RADEtype(6, 0, 1, 0), new RADEtype(6, 0, -1, 0), 6, "G2");
+                    //draw_line_on_screen(new RADEtype(6, 0, 1, 0), new RADEtype(6, 0, -1, 0), 6, "G2");
                     draw_text_on_screen(new RADEtype(6, 0, 0, 0), 1, "G2", "Sommersonnenwende", 6);
-                    draw_line_on_screen(new RADEtype(18, 0, 1, 0), new RADEtype(18, 0, -1, 0), 6, "G2");
+                    //draw_line_on_screen(new RADEtype(18, 0, 1, 0), new RADEtype(18, 0, -1, 0), 6, "G2");
                     draw_text_on_screen(new RADEtype(18, 0, 0, 0), 1, "G2", "Wintersonnenwende", 6);
                 }
                 // draw 0 and 12 meridian
@@ -999,6 +999,9 @@
             // draw sun
             {
                 draw_planet_on_screen(Sun, 31, "G2");
+                if (show_names) {
+                    draw_text_on_screen(Sun, 0, "G2", "Sun", 6);
+                }
             }
             // inscription
             text2.innerHTML = "<h2>"
