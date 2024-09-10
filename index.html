@@ -452,8 +452,8 @@
                 //console.log(rade.d.toFixed(2) + " = ");
                 let dtrunc = Math.trunc(rade.d);
                 let dfrac = Math.abs(rade.d - dtrunc);
-                rade.d = dtrunc;
                 rade.m = dfrac * 60;
+                rade.d = dtrunc;
                 //console.log(rade.d.toFixed(2) + " deg, " + rade.m.toFixed(2) + " minutes");
                 // RA
                 let a = 0;
@@ -957,13 +957,14 @@
                 // draw ecliptic
                 {
                     // North: right ascension 18h 0m 0.0s (exact), declination +66° 33′ 38.55″
+                    const step = .1;
                     let eclipticRADE = new RADEtype(18, 0, 66, 34);
                     let eclipticN = eclipticRADE.toV3D();
                     let springRADE = new RADEtype(0, 0, 0, 0);
                     let pos0 = springRADE.toV3D();
                     let rot2deg = new M3Dtype();
-                    rot2deg.create_rot_n(eclipticN, 1 * Math.PI / 180);
-                    for (let i = 0; i < 360; i += 2) {
+                    rot2deg.create_rot_n(eclipticN, step * Math.PI / 180);
+                    for (let i = 0; i < 360; i += 2 * step) {
                         let pos1 = rot2deg.mmul(pos0);
                         let pos0RADE = pos0.toRADE();
                         let pos1RADE = pos1.toRADE();
