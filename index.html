@@ -453,6 +453,7 @@
                 let dtrunc = Math.trunc(rade.d);
                 let dfrac = Math.abs(rade.d - dtrunc);
                 rade.m = dfrac * 60;
+                if (dtrunc == 0 && rade.d < 0) rade.m *= -1;
                 rade.d = dtrunc;
                 //console.log(rade.d.toFixed(2) + " deg, " + rade.m.toFixed(2) + " minutes");
                 // RA
