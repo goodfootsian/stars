@@ -675,23 +675,34 @@
             while (a >= 360) a -= 360;
             return a;
         }
+        var Sun = new RADEtype(11, 16.5, 4, 39.75);
         {
             // test JD and sun position
             const UTC0 = 2440587.5;
             let t0 = Date.now();
             let JD = UTC0 + t0 / 86400000;
             console.log("JD =" + JD.toString());
+/*
+            let JDwikipedia = 2440587.5 + Date.UTC(2024, 9 - 1, 10, 11, 12, 0) / 86400000;
+            // Date.UTC() liefert die Zeit in ms seit 1. Januar 1970, 00:00 UTC (= JD 2440587,5).
+            // Monate müssen im Wertebereich 0 .. 11 übergeben werden.
+            console.log("JDwikipedia =" + JDwikipedia.toString());
+            */
             let n = JD - 2451545.0;
             let L = 280.459 + 0.9856474 * n;
+            console.log("L=" + L.toString())
             L = to360(L);
+            console.log("L=" + L.toString())
             let g = 357.528 + 0.9856003 * n;
+            console.log("g=" + g.toString())
             g = to360(g);
+            console.log("g=" + g.toString())
             let Dach = L + 1.915 * Math.sin(g / 180 * Math.PI) + 0.01997 * Math.sin(2 * g / 180 * Math.PI);
             let eps = 23.439 - 0.00000036 * n;
             let RA = Math.atan(Math.cos(eps / 180 * Math.PI) * Math.tan(Dach / 180 * Math.PI)) / Math.PI * 180;
             if (Math.cos(Dach / 180 * Math.PI) < 0) {
             } else {
-                RA += 4 * Math.atan(1) / Math.PI * 180;
+                RA += 180;
             }
             RA /= 15; // convert to hours
             console.log("Sun Dach=" + Dach.toString())
@@ -958,11 +969,15 @@
                 cnt++;
                 //if (stars[i].h > 12) continue;
                 let starRADE = new RADEtype(stars[i].h, stars[i].dm, stars[i].d, stars[i].m);
-                let starpoint = starRADE.toV3D();
+                //let starpoint = starRADE.toV3D();
                 draw_star_on_screen(starRADE, stars[i].Ptm, stars[i].SpT);
                 if (show_names && stars[i].name.length && stars[i].Ptm < 2.5) {
                     draw_text_on_screen(starRADE, stars[i].Ptm, stars[i].SpT, stars[i].name, 6);
                 }
+            }
+            // draw sun
+            {
+                draw_star_on_screen(Sun, -3, "G2");
             }
             // inscription
             text2.innerHTML = "<h2>"
