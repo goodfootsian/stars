@@ -16,7 +16,7 @@
         <p>Add suitable fallback here.</p>
     </canvas>
     <script src="star_class.js"></script>
-    <script src="hip_db.js"></script>
+    <script src="hip_db_15k.js"></script>
     <script>
         class Ctype {
             constructor(constellation = "unknown", HD0 = "", HD1 = "") {
@@ -421,14 +421,15 @@
         }
 
         class RADEtype {
-            constructor(h = 0, dm = 0, d = 0, m = 0) {
+            constructor(h = 0, dm = 0, dsign = 1, d = 0, m = 0) {
                 this.h = h;  // increases when moving left
                 this.dm = dm;  // 10th of a minute
+                this.dsign = dsign;
                 this.d = d;    // positive is north, negative is south
                 this.m = m;
             }
             clone(a) {
-                return new RADEtype(this.h, this.dm, this.d, this.m);
+                return new RADEtype(this.h, this.dm, this.dsign, this.d, this.m);
             }
             toString(name = 'RADE') {
                 let s = name + '(RA=' + this.h.toFixed(2) + ', dm=' + this.dm.toFixed(2) + ', DE=' + this.d.toFixed(2) + ', m=' + this.m.toFixed(2) + ')';
@@ -439,11 +440,8 @@
                 let ra = (this.h + this.dm / 600) / 24 * 2 * Math.PI;
                 let de = (this.d) / 360 * 2 * Math.PI;
                 let de_mdec = (this.m / 60) / 360 * 2 * Math.PI;
-                if (de < 0) {
-                    de -= de_mdec;
-                } else {
-                    de += de_mdec;
-                }
+                de += de_mdec;
+                if (this.dsign < 0) de = -de;
                 let r = Math.cos(de);
                 a.z = Math.sin(de);
                 a.x = r * Math.cos(ra);
@@ -469,11 +467,14 @@
                 } else { 
                     rade.d = -Math.asin(d) / Math.PI * 180;
                 }
-                //console.log(rade.d.toFixed(2) + " = ");
+                rade.dsign = 1;
+                if (rade.d < 0) {
+                    rade.dsign = -1;
+                    rade.d = Math.abs(rade.d);
+                }
                 let dtrunc = Math.trunc(rade.d);
-                let dfrac = Math.abs(rade.d - dtrunc);
+                let dfrac = rade.d - dtrunc;
                 rade.m = dfrac * 60;
-                if (dtrunc == 0 && rade.d < 0) rade.m *= -1;
                 rade.d = dtrunc;
                 //console.log(rade.d.toFixed(2) + " deg, " + rade.m.toFixed(2) + " minutes");
                 // RA
@@ -685,8 +686,8 @@
             }
         }
         // point of view
-        var ego = new RADEtype(6, 0, 0, 0);
-        var egoP = new RADEtype(0, 0, 90, 0);
+        var ego = new RADEtype(6, 0, 1, 0, 0);
+        var egoP = new RADEtype(0, 0, 1, 90, 0);
         var e = ego.toV3D();
         var eP = egoP.toV3D();
 
@@ -699,7 +700,7 @@
             while (a >= 360) a -= 360;
             return a;
         }
-        var Sun = new RADEtype(11, 16.5, 4, 39.75);
+        var Sun = new RADEtype(11, 16.5, 1, 4, 39.75);
         {
             // test JD and sun position
             const UTC0 = 2440587.5;
@@ -735,7 +736,7 @@
         {
             // test SCREENtype
             console.log("test SCREENtype part 1 ");
-            let starpos = new RADEtype(0, 0, 45, 0);
+            let starpos = new RADEtype(0, 0, 1, 45, 0);
             {
                 console.log(screen.toString("screen before"));
                 console.log(starpos.toString("Polar"));
@@ -813,9 +814,9 @@
                 case 'M': rgb = new V3Dtype(255, 100, 64); break;
                 default: rgb = new V3Dtype(200, 200, 200); break;
             }
-            if (mag > 4) rgb.mul(.7);
-            if (mag > 5) rgb.mul(.6);
-            if (mag > 6) rgb.mul(.6);
+            if (mag > 4) rgb.mul(.9);
+            if (mag > 5) rgb.mul(.9);
+            if (mag > 6) rgb.mul(.9);
             let s = rgb.toRGB();
             return s;
         }
@@ -890,7 +891,7 @@
             let best_d = 100;
             let best_i = -1;
             for (let i = 0; i < stars.length; ++i) {
-                let starRADE = new RADEtype(stars[i].h, stars[i].dm, stars[i].d, stars[i].m);
+                let starRADE = new RADEtype(stars[i].h, stars[i].dm, stars[i].dsign, stars[i].d, stars[i].m);
                 let starpoint = starRADE.toV3D();
                 let d = starpoint.distance(n);
                 if (d < best_d) {
@@ -918,10 +919,10 @@
         function lookup_star(HD) {
             for (let i = 0; i < stars.length; ++i) {
                 if (stars[i].HD == HD) {
-                    return new RADEtype(stars[i].h, stars[i].dm, stars[i].d, stars[i].m);
+                    return new RADEtype(stars[i].h, stars[i].dm, stars[i].dsign, stars[i].d, stars[i].m);
                 }
             }
-            return new RADEtype(0, 0, 0, 0);
+            return new RADEtype(0, 0, 1, 0, 0);
 
         }
         function draw_field() {
@@ -945,43 +946,43 @@
             if (show_grid) {
                 // draw north pole
                 {
-                    draw_line_on_screen(new RADEtype(0, 0, 88, 0), new RADEtype(12, 0, 88, 0), 6, "G2");
-                    draw_line_on_screen(new RADEtype(6, 0, 88, 0), new RADEtype(18, 0, 88, 0), 6, "G2");
-                    draw_text_on_screen(new RADEtype(0, 0, 90, 0), 1, "G2", "North Pole", 6);
+                    draw_line_on_screen(new RADEtype(0, 0, 1, 88, 0), new RADEtype(12, 0, 1, 88, 0), 6, "G2");
+                    draw_line_on_screen(new RADEtype(6, 0, 1, 88, 0), new RADEtype(18, 0, 1, 88, 0), 6, "G2");
+                    draw_text_on_screen(new RADEtype(0, 0, 1, 90, 0), 1, "G2", "North Pole", 6);
                     /*
                     // color test
-                    draw_star_on_screen(new RADEtype(5, 0, 0, 0), -2, "O");
-                    draw_star_on_screen(new RADEtype(5, 200, 0, 0), -2, "B");
-                    draw_star_on_screen(new RADEtype(5, 400, 0, 0), -2, "A");
-                    draw_star_on_screen(new RADEtype(6, 0, 0, 0), -2, "F");
-                    draw_star_on_screen(new RADEtype(6, 200, 0, 0), -2, "G");
-                    draw_star_on_screen(new RADEtype(6, 400, 0, 0), -2, "K");
-                    draw_star_on_screen(new RADEtype(7, 0, 0, 0), -2, "M");
+                    draw_star_on_screen(new RADEtype(5, 0, 1, 0, 0), -2, "O");
+                    draw_star_on_screen(new RADEtype(5, 200, 1, 0, 0), -2, "B");
+                    draw_star_on_screen(new RADEtype(5, 400, 1, 0, 0), -2, "A");
+                    draw_star_on_screen(new RADEtype(6, 0, 1, 0, 0), -2, "F");
+                    draw_star_on_screen(new RADEtype(6, 200, 1, 0, 0), -2, "G");
+                    draw_star_on_screen(new RADEtype(6, 400, 1, 0, 0), -2, "K");
+                    draw_star_on_screen(new RADEtype(7, 0, 1, 0, 0), -2, "M");
                     */
                 }
                 // draw south pole
                 {
-                    draw_line_on_screen(new RADEtype(0, 0, -88, 0), new RADEtype(12, 0, -88, 0), 6, "G2");
-                    draw_line_on_screen(new RADEtype(6, 0, -88, 0), new RADEtype(18, 0, -88, 0), 6, "G2");
-                    draw_text_on_screen(new RADEtype(0, 0, -90, 0), 1, "G2", "South Pole", 6);
+                    draw_line_on_screen(new RADEtype(0, 0, -1, 88, 0), new RADEtype(12, 0, -1, 88, 0), 6, "G2");
+                    draw_line_on_screen(new RADEtype(6, 0, -1, 88, 0), new RADEtype(18, 0, -1, 88, 0), 6, "G2");
+                    draw_text_on_screen(new RADEtype(0, 0, -1, 90, 0), 1, "G2", "South Pole", 6);
                 }
                 // draw equator and wendekreise
                 for (let i = 0; i < 360; i += 2) {
                     const ecliptic_obliquity = 23.4; // degrees
                     const polar_de = 66.5; // degrees
-                    draw_line_on_screen(new RADEtype(i / 15, 0, 0, 0), new RADEtype((i + 1) / 15, 0, 0, 0), 6, "G2");
-                    draw_line_on_screen(new RADEtype(i / 15, 0, ecliptic_obliquity, 0), new RADEtype((i + 1) / 15, 0, ecliptic_obliquity, 0), 6, "G2");
-                    draw_line_on_screen(new RADEtype(i / 15, 0, -ecliptic_obliquity, 0), new RADEtype((i + 1) / 15, 0, -ecliptic_obliquity, 0), 6, "G2");
-                    draw_line_on_screen(new RADEtype(i / 15, 0, polar_de, 0), new RADEtype((i + 1) / 15, 0, polar_de, 0), 6, "B2");
-                    draw_line_on_screen(new RADEtype(i / 15, 0, -polar_de, 0), new RADEtype((i + 1) / 15, 0, -polar_de, 0), 6, "B2");
+                    draw_line_on_screen(new RADEtype(i / 15, 0, 1, 0, 0), new RADEtype((i + 1) / 15, 0, 1, 0, 0), 6, "G2");
+                    draw_line_on_screen(new RADEtype(i / 15, 0, 1, ecliptic_obliquity, 0), new RADEtype((i + 1) / 15, 0, 1, ecliptic_obliquity, 0), 6, "G2");
+                    draw_line_on_screen(new RADEtype(i / 15, 0, -1, ecliptic_obliquity, 0), new RADEtype((i + 1) / 15, 0, -1, ecliptic_obliquity, 0), 6, "G2");
+                    draw_line_on_screen(new RADEtype(i / 15, 0, 1, polar_de, 0), new RADEtype((i + 1) / 15, 0, 1, polar_de, 0), 6, "B2");
+                    draw_line_on_screen(new RADEtype(i / 15, 0, -1, polar_de, 0), new RADEtype((i + 1) / 15, 0, -1, polar_de, 0), 6, "B2");
                 }
                 // draw ecliptic
                 {
                     // North: right ascension 18h 0m 0.0s (exact), declination +66° 33′ 38.55″
                     const step = .1;
-                    let eclipticRADE = new RADEtype(18, 0, 66, 34);
+                    let eclipticRADE = new RADEtype(18, 0, 1, 66, 34);
                     let eclipticN = eclipticRADE.toV3D();
-                    let springRADE = new RADEtype(0, 0, 0, 0);
+                    let springRADE = new RADEtype(0, 0, 1, 0, 0);
                     let pos0 = springRADE.toV3D();
                     let rot2deg = new M3Dtype();
                     rot2deg.create_rot_n(eclipticN, step * Math.PI / 180);
@@ -993,25 +994,25 @@
                         draw_line_on_screen(pos0RADE, pos1RADE, 6, "G2");
                         pos0 = rot2deg.mmul(pos1);
                     }
-                    draw_text_on_screen(new RADEtype(0, 0, 0, 0), 1, "G2", "Frühlingspunkt", 6);
-                    draw_text_on_screen(new RADEtype(12, 0, 0, 0), 1, "G2", "Herbstpunkt", 6);
-                    //draw_line_on_screen(new RADEtype(6, 0, 1, 0), new RADEtype(6, 0, -1, 0), 6, "G2");
-                    draw_text_on_screen(new RADEtype(6, 0, 0, 0), 1, "G2", "Sommersonnenwende", 6);
-                    //draw_line_on_screen(new RADEtype(18, 0, 1, 0), new RADEtype(18, 0, -1, 0), 6, "G2");
-                    draw_text_on_screen(new RADEtype(18, 0, 0, 0), 1, "G2", "Wintersonnenwende", 6);
+                    draw_text_on_screen(new RADEtype(0, 0, 1, 0, 0), 1, "G2", "Frühlingspunkt", 6);
+                    draw_text_on_screen(new RADEtype(12, 0, 1, 0, 0), 1, "G2", "Herbstpunkt", 6);
+                    draw_text_on_screen(new RADEtype(6, 0, 1, 0, 0), 1, "G2", "Sommersonnenwende", 6);
+                    draw_text_on_screen(new RADEtype(18, 0, 1, 0, 0), 1, "G2", "Wintersonnenwende", 6);
                 }
                 // draw 0 and 12 meridian
-                for (let i = -87; i < 87; i += 2) {
-                    draw_line_on_screen(new RADEtype(0, 0, i, 0), new RADEtype(0, 0, i + 1, 0), 6, "G2");
-                    draw_line_on_screen(new RADEtype(12, 0, i, 0), new RADEtype(12, 0, i + 1, 0), 6, "G2");
+                for (let i = 1; i < 87; i += 2) {
+                    draw_line_on_screen(new RADEtype(0, 0, 1, i, 0), new RADEtype(0, 0, 1, i + 1, 0), 6, "G2");
+                    draw_line_on_screen(new RADEtype(12, 0, 1, i, 0), new RADEtype(12, 0, 1, i + 1, 0), 6, "G2");
+                    draw_line_on_screen(new RADEtype(0, 0, -1, i, 0), new RADEtype(0, 0, -1, i + 1, 0), 6, "G2");
+                    draw_line_on_screen(new RADEtype(12, 0, -1, i, 0), new RADEtype(12, 0, -1, i + 1, 0), 6, "G2");
                 }
             }
             // draw stars
             let cnt = 0;
             for (let i = 0; i < stars.length; ++i) {
                 cnt++;
-                //if (stars[i].h > 12) continue;
-                let starRADE = new RADEtype(stars[i].h, stars[i].dm, stars[i].d, stars[i].m);
+                //if (stars[i].Ptm < 6) continue;
+                let starRADE = new RADEtype(stars[i].h, stars[i].dm, stars[i].dsign, stars[i].d, stars[i].m);
                 //let starpoint = starRADE.toV3D();
                 draw_star_on_screen(starRADE, stars[i].Ptm, stars[i].SpT);
                 if (show_names && stars[i].name.length && stars[i].Ptm < 2.5) {

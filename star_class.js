@@ -1,12 +1,13 @@
 // the stars
 class STARtype {
-    constructor(name = "unknown", HD = "-", BD = "BD-", h = 3, dm = 4, d = 5, m = 6, Ptm = 0, SpT = "G2") {
+    constructor(name = "unknown", HD = "-", BD = "BD-", h = 3, dm = 4, dsign = 1, d = 5, m = 6, Ptm = 0, SpT = "G2") {
         this.name = name;
         this.HD = HD;
         this.BD = BD;
         this.h = h;  // increases when moving left
         this.dm = dm;  // 10th of a minute
-        this.d = d;    // positive is north, negative is south
+        this.dsign = dsign; // 1 is north, -1 is south
+        this.d = d;    
         this.m = m;
         this.Ptm = Ptm;
         this.SpT = SpT;
