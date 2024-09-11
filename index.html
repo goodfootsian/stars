@@ -929,7 +929,10 @@
             return new RADEtype(0, 0, 1, 0, 0);
 
         }
+        var tm1 = 0;
         function draw_field() {
+            let t = Date.now();
+            if (t - tm1 < 100) return;
             // fill with background color
             ctx.fillStyle = 'rgb(0, 0, 0)';
             ctx.fillRect(0, 0, cwidth, cheight);
@@ -1035,16 +1038,12 @@
                 + "Position: " + ego.toString('View') + "<br>"
                 + 'Stars: ' + cnt.toString() + "<br>"
                 + "Keys:" + "<br>"
-                + "<-    yaw left" + "<br>"
-                + "->    yaw right" + "<br>"
-                + "up    pitch up" + "<br>"
-                + "down  pitch down" + "<br>"
-                + "L     roll left" + "<br>"
-                + "R     roll right" + "<br>"
                 + "N     switch star names on/off" + "<br>"
                 + "G     switch grid on/off" + "<br>"
                 + "C     switch constellations on/off" + "<br>"
                 ;
+            tm1 = Date.now();
+            //console.log("date=" + Date.now().toString());
         }
 
         function loop() {
