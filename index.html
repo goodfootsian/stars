@@ -729,25 +729,18 @@
             // Monate müssen im Wertebereich 0 .. 11 übergeben werden.
             console.log("JDwikipedia =" + JDwikipedia.toString());
             */
-            let n = JD - 2451545.0;
-            let L = 280.459 + 0.9856474 * n;
-            console.log("L=" + L.toString())
-            L = to360(L);
-            console.log("L=" + L.toString())
-            let g = 357.528 + 0.9856003 * n;
-            console.log("g=" + g.toString())
-            g = to360(g);
-            console.log("g=" + g.toString())
-            let Dach = L + 1.915 * Math.sin(g / 180 * Math.PI) + 0.01997 * Math.sin(2 * g / 180 * Math.PI);
-            let eps = 23.439 - 0.00000036 * n;
-            let RA = Math.atan(Math.cos(eps / 180 * Math.PI) * Math.tan(Dach / 180 * Math.PI)) / Math.PI * 180;
-            if (Math.cos(Dach / 180 * Math.PI) < 0) {
-            } else {
-                RA += 180;
-            }
-            RA /= 15; // convert to hours
-            console.log("Sun Dach=" + Dach.toString())
-            console.log("Sun RA=" + RA.toString())
+            let D = JD - 2451545.0;
+            let g = 357.529 + 0.98560028 * D;
+            let q = 280.459 + 0.98564736 * D;
+            let L = q + 1.915 * Math.sin(g / 180 * Math.PI) + 0.020 * Math.sin(2 * g / 180 * Math.PI);
+            let R = 1.00014 - 0.01671 * Math.cos(g / 180 * Math.PI) - 0.00014 * Math.cos(2 * g / 180 * Math.PI);
+            let e = 23.439 - 0.00000036 * D;
+            let RA = Math.atan2(Math.cos(e / 180 * Math.PI) * Math.sin(L / 180 * Math.PI), Math.cos(L / 180 * Math.PI));
+            RA = RA / Math.PI * 180 / 15;
+            let d = Math.asin(Math.sin(e / 180 * Math.PI) * Math.sin(L / 180 * Math.PI));
+            d = d / Math.PI * 180;
+            console.log("Sun RA=" + RA.toString() + ", d=" + d.toString());
+            Sun = new RADEtype(RA, 0, 1, d, 0);
         }
         {
             // test SCREENtype
