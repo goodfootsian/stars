@@ -988,6 +988,10 @@
                     draw_line_on_screen(new RADEtype(i / 15, 0, 1, polar_de, 0), new RADEtype((i + 1) / 15, 0, 1, polar_de, 0), 6, "B2");
                     draw_line_on_screen(new RADEtype(i / 15, 0, -1, polar_de, 0), new RADEtype((i + 1) / 15, 0, -1, polar_de, 0), 6, "B2");
                 }
+                // draw hours at equator
+                for (let i = 0; i < 24; ++i) {
+                    draw_text_on_screen(new RADEtype(i, 0, 1, 0, 0), 1, "G2", i.toString(), 6);
+                }
                 // draw ecliptic
                 {
                     // North: right ascension 18h 0m 0.0s (exact), declination +66° 33′ 38.55″
