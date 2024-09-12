@@ -716,7 +716,7 @@
             while (a >= 360) a -= 360;
             return a;
         }
-        var Sun = new RADEtype(11, 16.5, 1, 4, 39.75);
+        var Sun = new RADEtype();
         {
             // test JD and sun position
             const UTC0 = 2440587.5;
@@ -742,6 +742,7 @@
             console.log("Sun RA=" + RA.toString() + ", d=" + d.toString());
             Sun = new RADEtype(RA, 0, 1, d, 0);
         }
+        var MyPosition = new RADEtype(8.75 / 15, 1, 48, 43);  // Empfingen
         {
             // test SCREENtype
             console.log("test SCREENtype part 1 ");
@@ -890,6 +891,22 @@
             ctx.textAlign = "left";
             ctx.textBaseline = 'top'
             ctx.fillText(text, s1.x + sz, s1.y + sz);
+        }
+        function draw_x_on_screen(p, mag, color, text, magStar) {
+            {
+                let p0 = p.clone();
+                let p1 = p.clone();
+                p0.d += 1;
+                p1.d -= 1;
+                draw_line_on_screen(p0, p1, mag, color);
+            }
+            {
+                let p0 = p.clone();
+                let p1 = p.clone();
+                p0.h += 1/15;
+                p1.h -= 1/15;
+                draw_line_on_screen(p0, p1, mag, color);
+            }
         }
         var fifo_i = 0;
         var fifo = [];
@@ -1053,6 +1070,17 @@
                 ;
             tm1 = Date.now();
             //console.log("date=" + Date.now().toString());
+            // Zenith
+            {
+                let t0 = Date.now() / 1000;
+                let hour = t0 / 3600;
+                console.log("Hour=" + hour.toString());
+                let zenith = MyPosition.clone();
+                zenith.h += hour;
+                console.log(zenith.toString("Zenith"));
+                draw_text_on_screen(zenith, 1, "G2", "Zenith in Epmfingen", 6);
+                draw_x_on_screen(zenith, 1, "G2", "Zenith in Epmfingen", 6);
+            }
         }
 
         function loop() {
