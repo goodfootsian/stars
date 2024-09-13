@@ -532,18 +532,18 @@
                 let result = new V3Dtype(this.y * b.z - this.z * b.y, this.z * b.x - this.x * b.z, this.x * b.y - this.y * b.x);
                 return result.normalize();
             }
-            perpendicular(b) {
+            perpendicular() {
                 let result = new V3Dtype();
-                if (b.x == 0 && b.y == 0) {
-                    result.x = -b.z;
-                    result.y = b.y;
-                    result.z = b.x;
+                if (this.x == 0 && this.y == 0) {
+                    result.x = -this.z;
+                    result.y = this.y;
+                    result.z = this.x;
                 } else {
-                    result.x = -b.y;
-                    result.y = b.x;
-                    result.z = b.z;
+                    result.x = -this.y;
+                    result.y = this.x;
+                    result.z = this.z;
                 }
-                return result();
+                return result;
             }
             normalize() {
                 let a = this.abs(this);
@@ -844,13 +844,31 @@
             let s = rgb.toRGB();
             return s;
         }
+        var szt_color = [];
+        szt_color.push('#8080ff');
+        szt_color.push('#80ff80');
+        szt_color.push('#80ffff');
+        szt_color.push('#ff8080');
+        szt_color.push('#ff80ff');
+        szt_color.push('#ffff80');
+        szt_color.push('#ffffff');
         function draw_star(mag, color, x, y) {
-            //let ulux = 1e8 * Math.pow(10, -0.4 * (mag + 14.2));
             let sz = get_star_radius(mag);
+            // the star
             ctx.fillStyle = getRGB(color, mag);
             ctx.beginPath();
             ctx.arc(x, y, sz, 0, 2 * Math.PI);
             ctx.fill();
+            // szintillation: refractions
+            const n = 8;
+            for (let i = 0; i < n; i += 1) {
+                if (Math.random() < .9) continue;
+                ctx.fillStyle = szt_color[Math.trunc(Math.random() * szt_color.length)];
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.ellipse(x, y, sz, sz, 0, 2 * Math.PI / n * i, 2 * Math.PI / n * (i + 1));
+                ctx.fill();
+            }
         }
         function draw_line(mag, color, x0, y0, x1, y1) {
             let sz = get_star_radius(mag);
@@ -877,10 +895,20 @@
             {
                 let dev_angle = 0.1;
                 let dev_direction = Math.random() * 2 * Math.PI;
+                let n1 = s1c.perpendicular();
+                let n2 = s1c.xproduct_n(n1);
             }
             // convert to screen coordinates
             let s1 = screen.V3DtoScreen(s1c);
             if (screen.na.error) return;
+            // add szintillation on screen level
+            {
+                // position
+                let dev_angle = Math.random() * 2 * Math.PI;;
+                let dev_direction = Math.random() / 2000;
+                s1.x += Math.cos(dev_angle) * dev_direction * screen.magnification;
+                s1.y += Math.sin(dev_angle) * dev_direction * screen.magnification;
+            }
             draw_star(mag, color, s1.x, s1.y);
         }
         function draw_planet_on_screen(p1, minutes, color) {
@@ -1094,12 +1122,12 @@
             {
                 let t0 = Date.now() / 1000;
                 let hour = t0 / 3600;
-                console.log("Hour=" + hour.toString());
+                //console.log("Hour=" + hour.toString());
                 let zenith = MyPosition.clone();
                 zenith.h += hour;
-                console.log(zenith.toString("Zenith"));
-                draw_text_on_screen(zenith, 1, "G2", "Zenith in Epmfingen", 6);
-                draw_x_on_screen(zenith, 1, "G2", "Zenith in Epmfingen", 6);
+                //console.log(zenith.toString("Zenith"));
+                draw_text_on_screen(zenith, 1, "G2", "Zenit in Epmfingen", 6);
+                draw_x_on_screen(zenith, 1, "G2", "Zenit in Epmfingen", 6);
             }
         }
 
