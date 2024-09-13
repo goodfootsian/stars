@@ -532,6 +532,19 @@
                 let result = new V3Dtype(this.y * b.z - this.z * b.y, this.z * b.x - this.x * b.z, this.x * b.y - this.y * b.x);
                 return result.normalize();
             }
+            perpendicular(b) {
+                let result = new V3Dtype();
+                if (b.x == 0 && b.y == 0) {
+                    result.x = -b.z;
+                    result.y = b.y;
+                    result.z = b.x;
+                } else {
+                    result.x = -b.y;
+                    result.y = b.x;
+                    result.z = b.z;
+                }
+                return result();
+            }
             normalize() {
                 let a = this.abs(this);
                 this.x /= a;
@@ -549,6 +562,7 @@
                 this.x -= a.x;
                 this.y -= a.y;
                 this.z -= a.z;
+                return this;
             }
             distance(a) {
                 return new V3Dtype(this.x - a.x, this.y - a.y, this.z - a.z).abs();
@@ -859,6 +873,12 @@
         }
         function draw_star_on_screen(p1, mag, color) {
             let s1c = p1.toV3D();
+            // add szintillation: position
+            {
+                let dev_angle = 0.1;
+                let dev_direction = Math.random() * 2 * Math.PI;
+            }
+            // convert to screen coordinates
             let s1 = screen.V3DtoScreen(s1c);
             if (screen.na.error) return;
             draw_star(mag, color, s1.x, s1.y);
