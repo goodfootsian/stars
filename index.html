@@ -201,7 +201,7 @@
                 f = 1 / f;
             } else if (evt.deltaY < 0) {
                 //
-            } 
+            }
             mtWheel(evt.pageX, evt.pageY, f);
         }
 
@@ -355,7 +355,7 @@
                             //console.log("end points: " + a1.toString("a0") + " " + b1.toString("b0") + " d1=" + d0);
                             //console.log("middle point: " + m.toString("m") + ", d1/d0=" + (d1 / d0).toFixed(2));
                             console.log("t2move, " + touches[0].pageX.toFixed(0) + ", " + touches[0].pageY.toFixed(0) + " ||| " + touches[1].pageX.toFixed(0) + ", " + touches[1].pageY.toFixed(0) + ", d0=" + d0.toFixed(2) + ", " + m.toString("m") + ", magnification=" + screen.magnification.toFixed(2));
-                            mtWheel(m.x, m.y, d1/d0);
+                            mtWheel(m.x, m.y, d1 / d0);
                             mstart_x = touches[0].pageX;
                             mstart_y = touches[0].pageY;
                             mstart1_x = touches[1].pageX;
@@ -480,7 +480,7 @@
                     rade.d = 90;
                 } else if (d > 1) {
                     rade.d = -90;
-                } else { 
+                } else {
                     rade.d = -Math.asin(d) / Math.PI * 180;
                 }
                 rade.dsign = 1;
@@ -585,6 +585,38 @@
                 let s = '#' + Math.trunc(this.x).toString(16).padStart(2, '0') + Math.trunc(this.y).toString(16).padStart(2, '0') + Math.trunc(this.z).toString(16).padStart(2, '0');
                 return s;
             }
+            hsbToRgb() {
+                // H: red - yellow - green - cyan - blue, purple
+                // The range of the input parameters is H: [0, 360], S: [0, 100], B: [0, 100]
+                // range of all output values is[0, 255].
+                let h = this.x;
+                let s = this.y;
+                let b = this.z;
+                s /= 100;
+                b /= 100;
+                const k = (n) => (n + h / 60) % 6;
+                const f = (n) => b * (1 - s * Math.max(0, Math.min(k(n), 4 - k(n), 1)));
+                return new V3Dtype(255 * f(5), 255 * f(3), 255 * f(1));
+            }
+            rgbToHsb() {
+                // The range of all input parameters is [0, 255]
+                // range of the resulting values is H: [0, 360], S: [0, 100], B: [0, 100].
+                let r = this.x;
+                let g = this.y;
+                let b = this.z;
+                r /= 255;
+                g /= 255;
+                b /= 255;
+                const v = Math.max(r, g, b),
+                    n = v - Math.min(r, g, b);
+                const h =
+                    n === 0 ? 0 : n && v === r ? (g - b) / n : v === g ? 2 + (b - r) / n : 4 + (r - g) / n;
+                return new V3Dtype(60 * (h < 0 ? h + 6 : h), v && (n / v) * 100, v * 100);
+            }
+        }
+        {
+            console.log(new V3Dtype(90, 100, 100).hsbToRgb().toString());
+            console.log(new V3Dtype(0, 255, 255).rgbToHsb().toString());
         }
         class NAtype {
             // Hesse normal form. Can be a plane or a line
@@ -642,8 +674,7 @@
                 return new V3Dtype(x, y, 0);
             }
         }
-        class M3Dtype
-        {
+        class M3Dtype {
             constructor(ax = 0, ay = 0, az = 0, bx = 0, by = 0, bz = 0, cx = 0, cy = 0, cz = 0) {
                 this.ax = ax;
                 this.ay = ay;
@@ -737,12 +768,12 @@
             let t0 = Date.now();
             let JD = UTC0 + t0 / 86400000;
             console.log("JD =" + JD.toString());
-/*
-            let JDwikipedia = 2440587.5 + Date.UTC(2024, 9 - 1, 10, 11, 12, 0) / 86400000;
-            // Date.UTC() liefert die Zeit in ms seit 1. Januar 1970, 00:00 UTC (= JD 2440587,5).
-            // Monate müssen im Wertebereich 0 .. 11 übergeben werden.
-            console.log("JDwikipedia =" + JDwikipedia.toString());
-            */
+            /*
+                        let JDwikipedia = 2440587.5 + Date.UTC(2024, 9 - 1, 10, 11, 12, 0) / 86400000;
+                        // Date.UTC() liefert die Zeit in ms seit 1. Januar 1970, 00:00 UTC (= JD 2440587,5).
+                        // Monate müssen im Wertebereich 0 .. 11 übergeben werden.
+                        console.log("JDwikipedia =" + JDwikipedia.toString());
+                        */
             let D = JD - 2451545.0;
             let g = 357.529 + 0.98560028 * D;
             let q = 280.459 + 0.98564736 * D;
@@ -811,6 +842,11 @@
         }
         function get_star_radius(mag) {
             /*
+            if (mag < 3) return 2;
+            if (mag < 2) return 3;
+            return 1;
+            */
+            /*
             let r = 1;
             if (mag < 2) r = 1;
             if (mag < 1) r = 2;
@@ -826,6 +862,7 @@
                 console.log(i.toFixed(1) + ' => ' + get_star_radius(i).toFixed(2))
             }
         }
+        /*
         function getRGB(color, mag) {
             let rgb = 0;
             switch (color.charAt()) {
@@ -833,11 +870,43 @@
                 case 'B': rgb = new V3Dtype(150, 150, 255); break;
                 case 'A': rgb = new V3Dtype(220, 220, 255); break;
                 case 'F': rgb = new V3Dtype(255, 255, 220); break;
-                case 'G': rgb = new V3Dtype(255, 255, 100); break;
+                //case 'G': rgb = new V3Dtype(255, 255, 100); break;
+                case 'G': rgb = new V3Dtype(0xFD, 0xF9, 0xB3); break;
                 case 'K': rgb = new V3Dtype(255, 127, 100); break;
                 case 'M': rgb = new V3Dtype(255, 100, 64); break;
                 default: rgb = new V3Dtype(200, 200, 200); break;
             }
+            if (mag > 4) rgb.mul(.9);
+            if (mag > 5) rgb.mul(.9);
+            if (mag > 6) rgb.mul(.9);
+            let s = rgb.toRGB();
+            return s;
+        }
+        // https://de.wikipedia.org/wiki/Spektralklasse
+let O = "#9BB0FF;" //    <td>blau</td>
+let B = "#BFD8FF;"> //    <td>blau-weiß</td>
+let A = "#E4E8FC;"> //<td>weiß (leicht bläulich)</td>
+let F = "#F9FAE7;"> //<td>weiß-gelb</td>
+let G = "#FDF9B3;"> //<td>gelb</td>
+let K = "#FFDD99;"> //<td>orange</td>
+let M = "#FFC886;"> //<td>rot-orange</td>
+*/
+        function getRGB(color, mag) {
+            let rgb = 0;
+            switch (color.charAt()) {
+                case 'O': rgb = new V3Dtype(0x9B, 0xB0, 0xFF); break;
+                case 'B': rgb = new V3Dtype(0xBF, 0xD8, 0xFF); break;
+                case 'A': rgb = new V3Dtype(0xE4, 0xE8, 0xFC); break;
+                case 'F': rgb = new V3Dtype(0xF9, 0xFA, 0xE7); break;
+                case 'G': rgb = new V3Dtype(0xFD, 0xF9, 0xB3); break;
+                case 'K': rgb = new V3Dtype(0xFF, 0xDD, 0x99); break;
+                case 'M': rgb = new V3Dtype(0xFF, 0xC8, 0x86); break;
+                default: rgb = new V3Dtype(0xff, 0xff, 0xff); break;
+            }
+            let hsb = rgb.rgbToHsb();
+            hsb.z = (9 - mag) / 10 * 100;
+            if (hsb.z >= 100) hsb.z = 100;
+            return hsb.hsbToRgb().toRGB();
             if (mag > 4) rgb.mul(.9);
             if (mag > 5) rgb.mul(.9);
             if (mag > 6) rgb.mul(.9);
@@ -859,6 +928,7 @@
             ctx.beginPath();
             ctx.arc(x, y, sz, 0, 2 * Math.PI);
             ctx.fill();
+            /*
             // szintillation: refractions
             const n = 8;
             for (let i = 0; i < n; i += 1) {
@@ -869,6 +939,7 @@
                 ctx.ellipse(x, y, sz, sz, 0, 2 * Math.PI / n * i, 2 * Math.PI / n * (i + 1));
                 ctx.fill();
             }
+            */
         }
         function draw_line(mag, color, x0, y0, x1, y1) {
             let sz = get_star_radius(mag);
@@ -892,12 +963,14 @@
         function draw_star_on_screen(p1, mag, color) {
             let s1c = p1.toV3D();
             // add szintillation: position
+            /*
             {
                 let dev_angle = 0.1;
                 let dev_direction = Math.random() * 2 * Math.PI;
                 let n1 = s1c.perpendicular();
                 let n2 = s1c.xproduct_n(n1);
             }
+            */
             // convert to screen coordinates
             let s1 = screen.V3DtoScreen(s1c);
             if (screen.na.error) return;
@@ -951,8 +1024,8 @@
             {
                 let p0 = p.clone();
                 let p1 = p.clone();
-                p0.h += 1/15;
-                p1.h -= 1/15;
+                p0.h += 1 / 15;
+                p1.h -= 1 / 15;
                 draw_line_on_screen(p0, p1, mag, color);
             }
         }
@@ -1026,15 +1099,17 @@
                     draw_line_on_screen(new RADEtype(0, 0, 1, 88, 0), new RADEtype(12, 0, 1, 88, 0), 6, "G2");
                     draw_line_on_screen(new RADEtype(6, 0, 1, 88, 0), new RADEtype(18, 0, 1, 88, 0), 6, "G2");
                     draw_text_on_screen(new RADEtype(0, 0, 1, 90, 0), 1, "G2", "North Pole", 6);
-                    /*
                     // color test
-                    draw_star_on_screen(new RADEtype(5, 0, 1, 0, 0), -2, "O");
-                    draw_star_on_screen(new RADEtype(5, 200, 1, 0, 0), -2, "B");
-                    draw_star_on_screen(new RADEtype(5, 400, 1, 0, 0), -2, "A");
-                    draw_star_on_screen(new RADEtype(6, 0, 1, 0, 0), -2, "F");
-                    draw_star_on_screen(new RADEtype(6, 200, 1, 0, 0), -2, "G");
-                    draw_star_on_screen(new RADEtype(6, 400, 1, 0, 0), -2, "K");
-                    draw_star_on_screen(new RADEtype(7, 0, 1, 0, 0), -2, "M");
+                    /*
+                    for (let mag = -1; mag < 8; ++mag) {
+                        draw_star_on_screen(new RADEtype(5, 0, 1, mag*3, 0), mag, "O");
+                        draw_star_on_screen(new RADEtype(5, 200, 1, mag*3, 0), mag, "B");
+                        draw_star_on_screen(new RADEtype(5, 400, 1, mag*3, 0), mag, "A");
+                        draw_star_on_screen(new RADEtype(6, 0, 1, mag*3, 0), mag, "F");
+                        draw_star_on_screen(new RADEtype(6, 200, 1, mag*3, 0), mag, "G");
+                        draw_star_on_screen(new RADEtype(6, 400, 1, mag*3, 0), mag, "K");
+                        draw_star_on_screen(new RADEtype(7, 0, 1, mag*3, 0), mag, "M");
+                    }
                     */
                 }
                 // draw south pole
@@ -1137,7 +1212,7 @@
                 switch (eventq) {
                     case 32:
                     case 13:
-                        Tetris.play();
+                        //Tetris.play();
                         status = st_playing;
                         break;
                 }
@@ -1243,7 +1318,7 @@
                             ego = e.toRADE();
                         }
                         break;
-                    case 82: 
+                    case 82:
                         //roll right
                         {
                             // e is the roll axis
@@ -1278,3 +1353,9 @@
     </script>
 </body>
 </html>
+
+
+
+
+
+
