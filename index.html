@@ -921,6 +921,7 @@ let M = "#FFC886;"> //<td>rot-orange</td>
             }
             let hsb = rgb.rgbToHsb();
             hsb.z = (9 - mag) / 10 * 100;
+            hsb.z = 20+80*get_star_radius(mag) / get_star_radius(-1.5);
             if (hsb.z >= 100) hsb.z = 100;
             return hsb.hsbToRgb().toRGB();
             if (mag > 4) rgb.mul(.9);
@@ -942,7 +943,8 @@ let M = "#FFC886;"> //<td>rot-orange</td>
             // the star
             ctx.fillStyle = getRGB(color, mag);
             ctx.beginPath();
-            ctx.arc(x, y, sz, 0, 2 * Math.PI);
+            if (sz > 4) sz = 4;
+            ctx.arc(x, y, sz*3/4+1, 0, 2 * Math.PI);
             ctx.fill();
             /*
             // szintillation: refractions
@@ -1116,8 +1118,7 @@ let M = "#FFC886;"> //<td>rot-orange</td>
                     draw_line_on_screen(new RADEtype(6, 0, 1, 88, 0), new RADEtype(18, 0, 1, 88, 0), 6, "G2");
                     draw_text_on_screen(new RADEtype(0, 0, 1, 90, 0), 1, "G2", "North Pole", 6);
                     // color test
-                    /*
-                    for (let mag = -1; mag < 8; ++mag) {
+                    if (0) for (let mag = -1; mag < 8; ++mag) {
                         draw_star_on_screen(new RADEtype(5, 0, 1, mag*3, 0), mag, "O");
                         draw_star_on_screen(new RADEtype(5, 200, 1, mag*3, 0), mag, "B");
                         draw_star_on_screen(new RADEtype(5, 400, 1, mag*3, 0), mag, "A");
@@ -1126,7 +1127,6 @@ let M = "#FFC886;"> //<td>rot-orange</td>
                         draw_star_on_screen(new RADEtype(6, 400, 1, mag*3, 0), mag, "K");
                         draw_star_on_screen(new RADEtype(7, 0, 1, mag*3, 0), mag, "M");
                     }
-                    */
                 }
                 // draw south pole
                 {
