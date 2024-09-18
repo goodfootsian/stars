@@ -907,7 +907,7 @@ let G = "#FDF9B3;"> //<td>gelb</td>
 let K = "#FFDD99;"> //<td>orange</td>
 let M = "#FFC886;"> //<td>rot-orange</td>
 */
-        function getRGB(color, mag) {
+        function getHSB(color) {
             let rgb = 0;
             switch (color.charAt()) {
                 case 'O': rgb = new V3Dtype(0x9B, 0xB0, 0xFF); break;
@@ -919,9 +919,13 @@ let M = "#FFC886;"> //<td>rot-orange</td>
                 case 'M': rgb = new V3Dtype(0xFF, 0xC8, 0x86); break;
                 default: rgb = new V3Dtype(0xff, 0xff, 0xff); break;
             }
-            let hsb = rgb.rgbToHsb();
+            return rgb.rgbToHsb();
+        }
+        function getRGB(color, mag) {
+            let hsb = getHSB(color);
+            //let hsb = rgb.rgbToHsb();
             hsb.z = (9 - mag) / 10 * 100;
-            hsb.z = 20+80*get_star_radius(mag) / get_star_radius(-1.5);
+            hsb.z = 20 + 80 * get_star_radius(mag) / get_star_radius(-1.5);
             if (hsb.z >= 100) hsb.z = 100;
             return hsb.hsbToRgb().toRGB();
             if (mag > 4) rgb.mul(.9);
@@ -980,19 +984,10 @@ let M = "#FFC886;"> //<td>rot-orange</td>
         }
         function draw_star_on_screen(p1, mag, color) {
             let s1c = p1.toV3D();
-            // add szintillation: position
-            /*
-            {
-                let dev_angle = 0.1;
-                let dev_direction = Math.random() * 2 * Math.PI;
-                let n1 = s1c.perpendicular();
-                let n2 = s1c.xproduct_n(n1);
-            }
-            */
             // convert to screen coordinates
             let s1 = screen.V3DtoScreen(s1c);
             if (screen.na.error) return;
-            // add szintillation on screen level
+            // add positional szintillation on screen level
             {
                 // position
                 let dev_angle = Math.random() * 2 * Math.PI;;
@@ -1000,7 +995,20 @@ let M = "#FFC886;"> //<td>rot-orange</td>
                 s1.x += Math.cos(dev_angle) * dev_direction * screen.magnification;
                 s1.y += Math.sin(dev_angle) * dev_direction * screen.magnification;
             }
-            draw_star(mag, color, s1.x, s1.y);
+            let sz = get_star_radius(mag);
+            let hsb = getHSB(color);
+            hsb.z = (8 - mag) / 10 * 100;
+            //hsb.z = 100;
+            // add brightness szintillation
+            if (Math.random() < .03) {
+                hsb.z *= Math.random();
+            }
+            // draw the circle
+            ctx.fillStyle = hsb.hsbToRgb().toRGB();
+            ctx.beginPath();
+            if (sz > 4) sz = 4;
+            ctx.arc(s1.x, s1.y, sz * 3 / 4 + 1, 0, 2 * Math.PI);
+            ctx.fill();
         }
         function draw_planet_on_screen(p1, minutes, color) {
             // calculate position on screen
@@ -1118,7 +1126,7 @@ let M = "#FFC886;"> //<td>rot-orange</td>
                     draw_line_on_screen(new RADEtype(6, 0, 1, 88, 0), new RADEtype(18, 0, 1, 88, 0), 6, "G2");
                     draw_text_on_screen(new RADEtype(0, 0, 1, 90, 0), 1, "G2", "North Pole", 6);
                     // color test
-                    if (0) for (let mag = -1; mag < 8; ++mag) {
+                    if (false) for (let mag = -1; mag < 8; ++mag) {
                         draw_star_on_screen(new RADEtype(5, 0, 1, mag*3, 0), mag, "O");
                         draw_star_on_screen(new RADEtype(5, 200, 1, mag*3, 0), mag, "B");
                         draw_star_on_screen(new RADEtype(5, 400, 1, mag*3, 0), mag, "A");
