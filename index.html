@@ -779,7 +779,7 @@
         }
         var Sun = new RADEtype();
         {
-            // test JD and sun position
+            // calculate sun position
             const UTC0 = 2440587.5;
             let t0 = Date.now();
             let JD = UTC0 + t0 / 86400000;
@@ -790,7 +790,7 @@
                         // Monate müssen im Wertebereich 0 .. 11 übergeben werden.
                         console.log("JDwikipedia =" + JDwikipedia.toString());
                         */
-            let D = JD - 2451545.0;
+            let D = JD - 2451545.0; // D, the number of days and fraction (+ or –) from the epoch referred to as "J2000.0", which is 2000 January 1.5, Julian date 2451545.0:
             let g = 357.529 + 0.98560028 * D;
             let q = 280.459 + 0.98564736 * D;
             let L = q + 1.915 * Math.sin(g / 180 * Math.PI) + 0.020 * Math.sin(2 * g / 180 * Math.PI);
@@ -802,6 +802,35 @@
             d = d / Math.PI * 180;
             console.log("Sun RA=" + RA.toString() + ", d=" + d.toString());
             Sun = new RADEtype(RA, 0, 1, d, 0);
+        }
+        var Moon = new RADEtype();
+        {
+            // calculate sun position
+            const UTC0 = 2440587.5;
+            let t0 = Date.now();
+            let JD = UTC0 + t0 / 86400000;
+            console.log("JD =" + JD.toString());
+            /*
+                        let JDwikipedia = 2440587.5 + Date.UTC(2024, 9 - 1, 10, 11, 12, 0) / 86400000;
+                        // Date.UTC() liefert die Zeit in ms seit 1. Januar 1970, 00:00 UTC (= JD 2440587,5).
+                        // Monate müssen im Wertebereich 0 .. 11 übergeben werden.
+                        console.log("JDwikipedia =" + JDwikipedia.toString());
+                        */
+            let D = JD - 2451545.0;
+            let Tau = JD / 36525; // number of Julian centuries since 2000/01/01 at 12 UT
+            let Lambda = to360(218.31665 + 481267.88134 * Tau);
+            console.log("Moon ecliptic length Lambda/°=" + Lambda.toString());
+            let eclipticRADE = new RADEtype(18, 0, 1, 66, 34);
+            let eclipticN = eclipticRADE.toV3D();
+            let springRADE = new RADEtype(0, 0, 1, 0, 0);
+            let pos0 = springRADE.toV3D();
+            let rot2deg = new M3Dtype();
+            rot2deg.create_rot_n(eclipticN, Lambda * Math.PI / 180);
+            let pos1 = rot2deg.mmul(pos0);
+            let pos0RADE = pos0.toRADE();
+            let pos1RADE = pos1.toRADE();
+            Moon = pos1RADE;
+            console.log("Moon RA=" + Moon.toString("MoonRADE"));
         }
         var MyPosition = new RADEtype(8.75 / 15, 1, 48, 43);  // Empfingen
         {
@@ -1204,6 +1233,13 @@ let M = "#FFC886;"> //<td>rot-orange</td>
                 draw_planet_on_screen(Sun, 31, "G2");
                 if (show_names) {
                     draw_text_on_screen(Sun, 0, "G2", "Sun", 6);
+                }
+            }
+            // draw moon
+            {
+                draw_planet_on_screen(Moon, 60, "G2");
+                if (show_names) {
+                    draw_text_on_screen(Moon, 0, "G2", "Moon", 6);
                 }
             }
             // inscription
