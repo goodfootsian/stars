@@ -803,8 +803,9 @@
             console.log("Sun RA=" + RA.toString() + ", d=" + d.toString());
             Sun = new RADEtype(RA, 0, 1, d, 0);
         }
-        var Moon = new RADEtype();
+        var Moon = new RADEtype(2, 380, 1, 18, 20); // 21 SEP 2024
         {
+            let arrow = (val) => "===>" + val;
             // calculate sun position
             const UTC0 = 2440587.5;
             let t0 = Date.now();
@@ -819,6 +820,8 @@
             let D = JD - 2451545.0;
             let Tau = JD / 36525; // number of Julian centuries since 2000/01/01 at 12 UT
             let Lambda = to360(218.31665 + 481267.88134 * Tau);
+            Lambda = 2.6 * 15;
+
             console.log("Moon ecliptic length Lambda/°=" + Lambda.toString());
             let eclipticRADE = new RADEtype(18, 0, 1, 66, 34);
             let eclipticN = eclipticRADE.toV3D();
@@ -1113,7 +1116,7 @@ let M = "#FFC886;"> //<td>rot-orange</td>
                 fifo[fifo_i] = stars[best_i].HD;
                 fifo_i = (fifo_i + 1) % 2;
                 if (fifo_i == 0) {
-                    console.log("constellation.push(new Ctype('unknown', '" + fifo[0] + "', '" + fifo[1] + "'));");
+                    console.log("constellation.push(new Ctype('unknown', '" + fifo[0] + "', '" + fifo[1] + "'));" + "  // (" + n.toRADE().toString("click RADE") + ")");
                 }
             }
             return str;
