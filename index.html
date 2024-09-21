@@ -274,6 +274,7 @@
                 default:
                     break;
             }
+            draw_field();
         }
         function mouseMove(evt) {
             mtMove(evt.pageX, evt.pageY);
@@ -803,7 +804,7 @@
             console.log("Sun RA=" + RA.toString() + ", d=" + d.toString());
             Sun = new RADEtype(RA, 0, 1, d, 0);
         }
-        var Moon = new RADEtype(2, 380, 1, 18, 20); // 21 SEP 2024
+        var Moon = new RADEtype(0, 0, 1, 0, 0); //
         {
             let arrow = (val) => "===>" + val;
             // calculate sun position
@@ -818,10 +819,18 @@
                         console.log("JDwikipedia =" + JDwikipedia.toString());
                         */
             let D = JD - 2451545.0;
-            let Tau = JD / 36525; // number of Julian centuries since 2000/01/01 at 12 UT
-            let Lambda = to360(218.31665 + 481267.88134 * Tau);
-            Lambda = 2.6 * 15;
-
+            let Tau = D / 36525; // number of Julian centuries since 2000/01/01 at 12 UT
+            // Mittlere epliktikale Länge
+            let Lambda = 218.31665 + 481267.88134 * Tau;
+            console.log("Moon ecliptic length Lambda/°=" + Lambda.toString());
+            Lambda = to360(Lambda);
+            console.log("Moon ecliptic length Lambda/°=" + Lambda.toString());
+            //Lambda = 2.6 * 15;
+            // Große Ungleichheit
+            let L = (val) => 134.96 + 477198.87 * val;
+            let big_ne = 6.289 * Math.sin(L(Tau) / 180 * Math.PI) + 0.214 * Math.sin(2 * L(Tau)) + 0.01 * Math.sin(3 * L(Tau));
+            console.log("big_ne/°=" + big_ne.toString());
+            Lambda += big_ne;
             console.log("Moon ecliptic length Lambda/°=" + Lambda.toString());
             let eclipticRADE = new RADEtype(18, 0, 1, 66, 34);
             let eclipticN = eclipticRADE.toV3D();
@@ -1130,10 +1139,7 @@ let M = "#FFC886;"> //<td>rot-orange</td>
             return new RADEtype(0, 0, 1, 0, 0);
 
         }
-        var tm1 = 0;
         function draw_field() {
-            let t = Date.now();
-            if (t - tm1 < 100) return;
             // fill with background color
             ctx.fillStyle = 'rgb(0, 0, 0)';
             ctx.fillRect(0, 0, cwidth, cheight);
@@ -1254,7 +1260,6 @@ let M = "#FFC886;"> //<td>rot-orange</td>
                 + "G     switch grid on/off" + "<br>"
                 + "C     switch constellations on/off" + "<br>"
                 ;
-            tm1 = Date.now();
             //console.log("date=" + Date.now().toString());
             // Zenith
             {
@@ -1267,8 +1272,10 @@ let M = "#FFC886;"> //<td>rot-orange</td>
                 draw_text_on_screen(zenith, 1, "G2", "Zenit in Epmfingen", 6);
                 draw_x_on_screen(zenith, 1, "G2", "Zenit in Epmfingen", 6);
             }
+            // last action: refresh timestamp
+            tm1 = Date.now();
         }
-
+        var tm1 = 0;
         function loop() {
             if (status == st_insertcoin) {
                 //process event:
@@ -1408,7 +1415,14 @@ let M = "#FFC886;"> //<td>rot-orange</td>
                 }
                 eventq = 0;
                 // draw
-                draw_field(ctx);
+                {
+                    let t = Date.now();
+                    if (t - tm1 > 499) {
+                        draw_field(ctx);
+                    }
+
+
+                }
             }
             requestAnimationFrame(loop);
         }
