@@ -156,8 +156,8 @@
         // User Manual
         var text2 = document.createElement('div');
         text2.style.position = 'absolute';
-        text2.style.top = 10 + 'px';
-        text2.style.left = 10 + 'px';
+        text2.style.top = 0;
+        text2.style.left = 0;
         text2.style.width = 100;
         text2.style.height = 200;
         text2.style.fontSize = "12px";
@@ -165,6 +165,20 @@
         text2.style.backgroundColor = "#00000000";
         text2.innerHTML = ""
         document.body.appendChild(text2);
+
+        // more text
+        var text3 = document.createElement('div');
+        text3.style.position = 'static';
+        text3.style.right = 0 + 'px';
+        text3.style.width = 500 + 'px';
+        text3.style.height = 500 + 'px';
+        text3.style.fontSize = "12px";
+        text3.style.color = "#505080";
+        text3.style.backgroundColor = "#00000000";
+        text3.innerHTML = "text3"
+        document.body.appendChild(text3);
+
+
 
         // event listeners
         var eventq = 0;
