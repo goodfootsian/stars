@@ -300,7 +300,7 @@
             let twoD = screen.Screento2D(new V3Dtype(evt.pageX, evt.pageY, 0));
             let n = screen.twoDtoV3D(twoD.x, twoD.y);
             mouseRADE = n.toRADE();
-            console.log(mouseRADE.toString("mouseRADE"));
+            //console.log(mouseRADE.toString("mouseRADE"));
         }
 
         // touch events
@@ -493,8 +493,13 @@
             console.log("Moon ecliptic length Lambda/°=" + Lambda.toString());
             // Ekliptikale Breite
             let F = 0;
+            FM = 93.272 + 13.229 * 36525 * Tau;
+            FM = to360(FM);
+            console.log("Moon distance to node FM°=" + FM.toString());
+            let Lat = Math.sin(FM) * 5;
+            console.log("Moon ecliptic latitude Lat°=" + Lat.toString());
             // transform ecliptic to earth coordinates
-            let springRADE = new RADEtype(0, 0, 1, 0, 0);
+            let springRADE = new RADEtype(0, 0, 1, -Lat, 0);
             let pos0 = springRADE.toV3D();
             let rot2deg = new M3Dtype();
             rot2deg.create_rot_n(eclipticN, Lambda * Math.PI / 180);
