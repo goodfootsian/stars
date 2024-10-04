@@ -504,13 +504,14 @@
             console.log("Moon ecliptic length Lambda/°=" + Lambda.toString());
             // Ekliptikale Breite
             let F = 0;
-            FM = 93.272 + 13.229 * 36525 * Tau;
+            FM = 93.272 + 13.229 * 36525 * Tau;  // https://de.wikipedia.org/wiki/Mondbahn#Fundamentalargumente
+            FM = 93.272 + 483202.018 * Tau;  // https://www.physik.uni-siegen.de/didaktik/materialien_offen/excel/gestoerte_mondba_ergaenzungen.pdf
             FM = to360(FM);
             console.log("Moon distance to node FM°=" + FM.toString());
             let Lat = Math.sin(FM) * 5;
             console.log("Moon ecliptic latitude Lat°=" + Lat.toString());
             // transform ecliptic to earth coordinates
-            let springRADE = new RADEtype(0, 0, 1, -Lat, 0);
+            let springRADE = new RADEtype(0, 0, 1, Lat, 0);
             let pos0 = springRADE.toV3D();
             let rot2deg = new M3Dtype();
             rot2deg.create_rot_n(eclipticN, Lambda * Math.PI / 180);
